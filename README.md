@@ -46,3 +46,5 @@ Confluent Control Center: http://localhost:9021
 ```      
 			
  
+
+![ Grafana Dashboard for a kSQL App](/images/ksql-grafana.png)
