@@ -1,0 +1,31 @@
+{
+    "servers": [{
+        "host": "kafka1",
+        "port": 3001,
+        "queries": [{
+            "obj": "kafka.server:type=BrokerTopicMetrics,name=MessagesInPerSec,topic=*",
+            "attr": ["Count", "OneMinuteRate"],
+            "resultAlias": "MessagesInPerSec",
+            "outputWriters": [{ "@class": "com.googlecode.jmxtrans.model.output.InfluxDbWriterFactory", "url": "http://influxdb:8086/", "username": "root", "password": "root", "database": "influx", "tags": { "application": "BytesInPerSec" } }]
+        }]
+    },{
+        "host": "kafka2",
+        "port": 3001,
+        "queries": [{
+            "obj": "kafka.server:type=BrokerTopicMetrics,name=MessagesInPerSec,topic=*",
+            "attr": ["Count", "OneMinuteRate"],
+            "resultAlias": "MessagesInPerSec",
+            "outputWriters": [{ "@class": "com.googlecode.jmxtrans.model.output.InfluxDbWriterFactory", "url": "http://influxdb:8086/", "username": "root", "password": "root", "database": "influx", "tags": { "application": "BytesInPerSec" } }]
+        }]
+    },{
+
+        "host": "kafka3",
+        "port": 3001,
+        "queries": [{
+            "obj": "kafka.server:type=BrokerTopicMetrics,name=MessagesInPerSec,topic=*",
+            "attr": ["Count", "OneMinuteRate"],
+            "resultAlias": "MessagesInPerSec",
+            "outputWriters": [{ "@class": "com.googlecode.jmxtrans.model.output.InfluxDbWriterFactory", "url": "http://influxdb:8086/", "username": "root", "password": "root", "database": "influx", "tags": { "application": "BytesInPerSec" } }]
+        }]
+    }]
+}

@@ -1,0 +1,31 @@
+#!/bin/sh
+#
+# load all CSV files from data/gdelt into postgres.
+# run this after "runme"
+#
+
+loadNews()
+{
+  cp docker-compose.yml data/gdelt
+  cd data/gdelt
+  for i in `ls -1 20*.csv`
+  do
+    FILE=$i
+    echo "Loading  ${FILE} into Postgres ..."
+    docker cp ${FILE} Postgres:/var/tmp
+    docker exec Postgres bash -c "psql -U postgres postgres -c \"\\copy GDELT_EVENT FROM '/var/tmp/${FILE}' WITH delimiter E'\t' null as ';' \" "
+    docker exec Postgres bash -c "psql -U postgres postgres -c \"SELECT count(*) from GDELT_EVENT;\" "
+    Pause
+  done
+}
+
+Pause()
+{
+  echo;echo "Paused"
+  read Pause
+  clear
+  echo;echo
+}
+
+
+loadNews

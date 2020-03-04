@@ -1,0 +1,152 @@
+# Start Confluent Platform specifying two options: (-d) to run in detached mode and (--build) 
+#to build the Kafka Connect image with the source connector kafka-connect-datagen from Confluent Hub.
+#You must allocate a minimum of 8 GB of Docker memory resource. The default memory allocation on Docker Desktop for Mac is 2 GB and must be changed.
+P_GITHUB_REPO=markteehan
+
+export DT=`date "+%Y%m%d-%H%M%S"`
+export DT2=`date "+%H%m%S"`
+
+run()
+{
+ clear
+ echo;echo $1
+}
+Pause()
+{
+  echo;echo "Paused"
+  read Pause
+  clear
+  echo;echo
+}
+
+
+
+clear
+echo "Initializing and restarting"
+sleep 2
+echo :"Truncate, drop, create table in postgres:"
+
+docker-compose -f docker-compose.yml exec postgres bash -c "psql -U postgres postgres -c \" TRUNCATE TABLE GDELT_EVENT;\" "
+docker-compose -f docker-compose.yml exec postgres bash -c "psql -U postgres postgres -c \" DROP TABLE GDELT_EVENT;\" "
+docker-compose -f docker-compose.yml exec postgres bash -c "psql -U postgres postgres -c \" CREATE TABLE GDELT_EVENT ( EVENTID BIGINT NOT NULL, EVENT_DATE VARCHAR(500) , MONTHYEAR VARCHAR(500) , YEAR VARCHAR(500) , FRACTIONDATE VARCHAR(500) , ACTOR1CODE VARCHAR(500), ACTOR1NAME VARCHAR(500), ACTOR1COUNTRYCODE VARCHAR(500), ACTOR1KNOWNGROUPCODE VARCHAR(500), ACTOR1ETHNICCODE VARCHAR(500), ACTOR1RELIGION1CODE VARCHAR(500), ACTOR1RELIGION2CODE VARCHAR(500), ACTOR1TYPE1CODE VARCHAR(500), ACTOR1TYPE2CODE VARCHAR(500), ACTOR1TYPE3CODE VARCHAR(500), ACTOR2CODE VARCHAR(500), ACTOR2NAME VARCHAR(500), ACTOR2COUNTRYCODE VARCHAR(500), ACTOR2KNOWNGROUPCODE VARCHAR(500), ACTOR2ETHNICCODE VARCHAR(500), ACTOR2RELIGION1CODE VARCHAR(500), ACTOR2RELIGION2CODE VARCHAR(500), ACTOR2TYPE1CODE VARCHAR(500), ACTOR2TYPE2CODE VARCHAR(500), ACTOR2TYPE3CODE VARCHAR(500), ISROOTEVENT VARCHAR(500) , EVENTCODE VARCHAR(500), EVENTBASECODE VARCHAR(500), EVENTROOTCODE VARCHAR(500), QUADCLASS VARCHAR(500) , GOLDSTEINSCALE VARCHAR(500) , NUMMENTIONS VARCHAR(500) , NUMSOURCES VARCHAR(500) , NUMARTICLES INTEGER , AVGTONE FLOAT, ACTOR1GEO_TYPE VARCHAR(500) , ACTOR1GEO_FULLNAME VARCHAR(500), ACTOR1GEO_COUNTRYCODE VARCHAR(500), ACTOR1GEO_ADM1CODE VARCHAR(500),ACTOR1GEO_ADM2CODE VARCHAR(500), ACTOR1GEO_LAT VARCHAR(500) , ACTOR1GEO_LONG VARCHAR(500) , ACTOR1GEO_FEATUREID VARCHAR(500), ACTOR2GEO_TYPE VARCHAR(10), ACTOR2GEO_FULLNAME VARCHAR(500), ACTOR2GEO_COUNTRYCODE VARCHAR(500), ACTOR2GEO_ADM1CODE VARCHAR(500),ACTOR2GEO_ADM2CODE VARCHAR(500), ACTOR2GEO_LAT VARCHAR(500) , ACTOR2GEO_LONG VARCHAR(500) , ACTOR2GEO_FEATUREID VARCHAR(500), ACTIONGEO_TYPE VARCHAR(500), ACTIONGEO_FULLNAME VARCHAR(500), ACTIONGEO_COUNTRYCODE VARCHAR(500), ACTIONGEO_ADM1CODE VARCHAR(500),ACTIONGEO_ADM2CODE VARCHAR(500), ACTIONGEO_LAT VARCHAR(500), ACTIONGEO_LONG VARCHAR(500), ACTIONGEO_FEATUREID VARCHAR(500), DATEADDED VARCHAR(200), SOURCEURL VARCHAR(5000));\" "
+
+
+Pause
+
+FILE=20190712181500.export.csv
+echo "Loading  data/gdelt/${FILE} into Postgres ..."
+docker cp data/gdelt/${FILE} Postgres:/var/tmp
+docker-compose -f docker-compose.yml exec postgres bash -c "psql -U postgres postgres -c \"delete from GDELT_EVENT; \" "
+docker-compose -f docker-compose.yml exec postgres bash -c "psql -U postgres postgres -c \"\\copy GDELT_EVENT FROM '/var/tmp/${FILE}' WITH delimiter E'\t' null as ';' \" "
+docker-compose -f docker-compose.yml exec postgres bash -c "psql -U postgres postgres -c \"SELECT count(*) from GDELT_EVENT;\" "
+Pause
+
+cat <<EOF >/tmp/cmd.sql
+SHOW CONNECTORS;
+EOF
+CMD=`cat /tmp/cmd.sql`
+set -x
+docker exec -it ksqldb-cli bash -c "echo \"${CMD}\" |  ksql http://ksqldb-server:8088"
+set +x
+Pause
+
+cat <<EOF >/tmp/cmd.sql
+CREATE SOURCE CONNECTOR sourcepostgres_${DT2} WITH ( 'connector.class'='io.confluent.connect.jdbc.JdbcSourceConnector', 'connection.url'='jdbc:postgresql://postgres:5432/postgres?user=postgres&password=postgres', 'mode'='incrementing','incrementing.column.name'='eventid', 'topic.prefix'='GDE_000_A_${DT2}-','table.whitelist'='gdelt_event','numeric.mapping'='best_fit','schema.pattern'='public');
+EOF
+CMD=`cat /tmp/cmd.sql`
+set -x
+docker exec -it ksqldb-cli bash -c "echo \"${CMD}\" |  ksql http://ksqldb-server:8088"
+set +x
+
+Pause
+cat <<EOF >/tmp/cmd.sql
+SHOW CONNECTORS;
+EOF
+CMD=`cat /tmp/cmd.sql|head -1`
+docker exec -it ksqldb-cli bash -c "echo \"${CMD}\" |  ksql http://ksqldb-server:8088"
+Pause
+
+APP=GDE
+REL=V01
+THR=A
+SEQ=010
+TYP=STR
+OBJ=${APP}_${SEQ}_${THR}_${TYP}_${REL}
+
+cat <<EOF >/tmp/cmd.sql
+set 'auto.offset.reset'='earliest';
+CREATE STREAM $OBJ WITH (kafka_topic='GDE_000_A_${DT2}-gdelt_event', value_format='avro',partitions=1);
+EOF
+CMD=`cat /tmp/cmd.sql`
+docker exec -it ksqldb-cli bash -c "echo \"${CMD}\" |  ksql http://ksqldb-server:8088"
+Pause
+sleep 5
+SEQ=020
+THR=B
+TYP=TAB
+OBJ=${APP}_${SEQ}_${THR}_${TYP}_${REL}
+cat <<EOF >/tmp/cmd.sql
+set 'auto.offset.reset'='earliest';
+CREATE TABLE $OBJ AS SELECT ACTOR1COUNTRYCODE as CTRY, cast(count(*) as bigint) as C_COUNT , SUM(AVGTONE) / COUNT(*) as C_AVGTONE,max(AVGTONE) as C_MAXTONE, min(AVGTONE) as C_MINTONE,cast(cast(MAX(cast(EVENTID as bigint)) as STRING) as BIGINT) as LAST_EVENTID FROM GDE_010_A_STR_V01 GROUP BY ACTOR1COUNTRYCODE;
+EOF
+CMD=`cat /tmp/cmd.sql`
+docker exec -it ksqldb-cli bash -c "echo \"${CMD}\" |  ksql http://ksqldb-server:8088"
+
+Pause
+SEQ=030
+TYP=RKY
+THR=C
+OBJ=${APP}_${SEQ}_${THR}_${TYP}_${REL}
+cat <<EOF >/tmp/cmd.sql
+set 'auto.offset.reset'='earliest';
+CREATE STREAM $OBJ WITH (KAFKA_TOPIC='GDE_020_B_TAB_V01', VALUE_FORMAT='AVRO');
+EOF
+CMD=`cat /tmp/cmd.sql`
+docker exec -it ksqldb-cli bash -c "echo \"${CMD}\" |  ksql http://ksqldb-server:8088"
+Pause
+
+
+SEQ=040
+TYP=RKY
+OBJ=${APP}_${SEQ}_${THR}_${TYP}_${REL}
+cat <<EOF >/tmp/cmd.sql
+set 'auto.offset.reset'='earliest';
+CREATE STREAM $OBJ AS SELECT CTRY,C_COUNT,C_AVGTONE,C_MAXTONE,C_MINTONE,LAST_EVENTID FROM GDE_030_C_RKY_V01;
+EOF
+CMD=`cat /tmp/cmd.sql`
+docker exec -it ksqldb-cli bash -c "echo \"${CMD}\" |  ksql http://ksqldb-server:8088"
+
+Pause
+SEQ=050
+TYP=RKY
+OBJ=${APP}_${SEQ}_${THR}_${TYP}_${REL}
+cat <<EOF >/tmp/cmd.sql
+set 'auto.offset.reset'='earliest';
+CREATE STREAM $OBJ AS SELECT * FROM GDE_040_C_RKY_V01 PARTITION BY LAST_EVENTID;
+EOF
+CMD=`cat /tmp/cmd.sql`
+docker exec -it ksqldb-cli bash -c "echo \"${CMD}\" |  ksql http://ksqldb-server:8088"
+Pause
+
+
+THR=B
+SEQ=060
+TYP=STR
+OBJ=${APP}_${SEQ}_${THR}_${TYP}_${REL}
+cat <<EOF >/tmp/cmd.sql
+set 'auto.offset.reset'='earliest';
+CREATE STREAM $OBJ  AS SELECT EVENTID as EVENTID, MONTHYEAR , YEAR , FRACTIONDATE , ACTOR1CODE , ACTOR1NAME , ACTOR1COUNTRYCODE , ACTOR1KNOWNGROUPCODE , ACTOR1ETHNICCODE , ACTOR1RELIGION1CODE , ACTOR1RELIGION2CODE , ACTOR1TYPE1CODE , ACTOR1TYPE2CODE , ACTOR1TYPE3CODE , ACTOR2CODE , ACTOR2NAME , ACTOR2COUNTRYCODE , ACTOR2KNOWNGROUPCODE , ACTOR2ETHNICCODE , ACTOR2RELIGION1CODE , ACTOR2RELIGION2CODE , ACTOR2TYPE1CODE , ACTOR2TYPE2CODE , ACTOR2TYPE3CODE , ISROOTEVENT , EVENTCODE , EVENTBASECODE , EVENTROOTCODE , QUADCLASS , GOLDSTEINSCALE , NUMMENTIONS , NUMSOURCES , NUMARTICLES , AVGTONE , ACTOR1GEO_TYPE , ACTOR1GEO_FULLNAME , ACTOR1GEO_COUNTRYCODE , ACTOR1GEO_ADM1CODE , ACTOR1GEO_ADM2CODE , ACTOR1GEO_LAT , ACTOR1GEO_LONG , ACTOR1GEO_FEATUREID , ACTOR2GEO_TYPE , ACTOR2GEO_FULLNAME , ACTOR2GEO_COUNTRYCODE , ACTOR2GEO_ADM1CODE , ACTOR2GEO_ADM2CODE , ACTOR2GEO_LAT , ACTOR2GEO_LONG , ACTOR2GEO_FEATUREID , ACTIONGEO_TYPE , ACTIONGEO_FULLNAME , ACTIONGEO_COUNTRYCODE , ACTIONGEO_ADM1CODE , ACTIONGEO_ADM2CODE , ACTIONGEO_LAT , ACTIONGEO_LONG , ACTIONGEO_FEATUREID , DATEADDED , SOURCEURL, C_MINTONE,C_AVGTONE,C_MAXTONE,cast(C_COUNT as INT) as C_COUNT FROM GDE_010_A_STR_V01 JOIN GDE_050_C_RKY_V01 WITHIN 60 MINUTES ON (EVENTID=LAST_EVENTID);
+EOF
+CMD=`cat /tmp/cmd.sql`
+docker exec -it ksqldb-cli bash -c "echo \"${CMD}\" |  ksql http://ksqldb-server:8088"
+Pause
+
+
+FILE=20191205000000.export.csv
+echo "Loading  data/gdelt/${FILE} into Postgres ..."
+docker cp data/gdelt/${FILE} Postgres:/var/tmp
+docker-compose -f docker-compose.yml exec postgres bash -c "psql -U postgres postgres -c \"\\copy GDELT_EVENT FROM '/var/tmp/${FILE}' WITH delimiter E'\t' null as ';' \" "
+docker-compose -f docker-compose.yml exec postgres bash -c "psql -U postgres postgres -c \"SELECT count(*) from GDELT_EVENT;\" "
+
+
+echo;echo;echo "Finished!"
