@@ -129,7 +129,7 @@ docker exec -it ksqldb-cli bash -c "echo \"${CMD}\" |  ksql http://ksqldb-server
 Pause
 
 
-THR=B
+THR=D
 SEQ=060
 TYP=STR
 OBJ=${APP}_${SEQ}_${THR}_${TYP}_${REL}
