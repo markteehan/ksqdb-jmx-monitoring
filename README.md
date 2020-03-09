@@ -1,6 +1,10 @@
 # ksql-grafana-monitoring
 
 This repo demonstrates monitoring a kSQL pipeline using a Grafana dashboard.
+
+![ Topology](images/topology.png)
+
+
 ```
 It consists of:
 docker-compose.yml - docker compose yaml for all containers
