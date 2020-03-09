@@ -15,7 +15,6 @@ loadNews()
     docker cp ${FILE} Postgres:/var/tmp
     docker exec Postgres bash -c "psql -U postgres postgres -c \"\\copy GDELT_EVENT FROM '/var/tmp/${FILE}' WITH delimiter E'\t' null as ';' \" "
     docker exec Postgres bash -c "psql -U postgres postgres -c \"SELECT count(*) from GDELT_EVENT;\" "
-    Pause
   done
 }
 

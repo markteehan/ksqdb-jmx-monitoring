@@ -1,31 +1,57 @@
 {
-    "servers": [{
-        "host": "kafka1",
-        "port": 3001,
-        "queries": [{
-            "obj": "kafka.server:type=BrokerTopicMetrics,name=MessagesInPerSec,topic=*",
-            "attr": ["Count", "OneMinuteRate"],
-            "resultAlias": "MessagesInPerSec",
-            "outputWriters": [{ "@class": "com.googlecode.jmxtrans.model.output.InfluxDbWriterFactory", "url": "http://influxdb:8086/", "username": "root", "password": "root", "database": "influx", "tags": { "application": "BytesInPerSec" } }]
-        }]
-    },{
-        "host": "kafka2",
-        "port": 3001,
-        "queries": [{
-            "obj": "kafka.server:type=BrokerTopicMetrics,name=MessagesInPerSec,topic=*",
-            "attr": ["Count", "OneMinuteRate"],
-            "resultAlias": "MessagesInPerSec",
-            "outputWriters": [{ "@class": "com.googlecode.jmxtrans.model.output.InfluxDbWriterFactory", "url": "http://influxdb:8086/", "username": "root", "password": "root", "database": "influx", "tags": { "application": "BytesInPerSec" } }]
-        }]
-    },{
-
-        "host": "kafka3",
-        "port": 3001,
-        "queries": [{
-            "obj": "kafka.server:type=BrokerTopicMetrics,name=MessagesInPerSec,topic=*",
-            "attr": ["Count", "OneMinuteRate"],
-            "resultAlias": "MessagesInPerSec",
-            "outputWriters": [{ "@class": "com.googlecode.jmxtrans.model.output.InfluxDbWriterFactory", "url": "http://influxdb:8086/", "username": "root", "password": "root", "database": "influx", "tags": { "application": "BytesInPerSec" } }]
-        }]
-    }]
-}
+  "servers": [
+    {
+      "port": "3001",
+      "host": "kafka1",
+      "queries": [
+        {
+          "outputWriters": [
+            {
+              "@class": "com.googlecode.jmxtrans.model.output.kafka.KafkaWriterFactory",
+              "producerConfig": { "bootstrap.servers": "kafka1:9092" },
+                       "topic": "JMX",
+              "resultSerializer": { "@class": "com.googlecode.jmxtrans.model.output.kafka.DetailedResultSerializer" } 
+            } ],
+                   "obj": "kafka.server:type=BrokerTopicMetrics,name=*,topic=GDE*",
+           "attr": [ "Value","Count","OneMinuteRate" ],
+           "resultAlias":"GDE"
+        }
+      ]
+    },
+    {
+      "port": "3001",
+      "host": "kafka2",
+      "queries": [
+        {
+          "outputWriters": [
+            {
+              "@class": "com.googlecode.jmxtrans.model.output.kafka.KafkaWriterFactory",
+              "producerConfig": { "bootstrap.servers": "kafka1:9092" },
+                       "topic": "JMX",
+              "resultSerializer": { "@class": "com.googlecode.jmxtrans.model.output.kafka.DetailedResultSerializer" } 
+            } ],
+                   "obj": "kafka.server:type=BrokerTopicMetrics,name=*,topic=GDE*",
+           "attr": [ "Value","Count","OneMinuteRate" ],
+           "resultAlias":"GDE"
+        }
+      ]
+    },
+    {
+      "port": "3001",
+      "host": "kafka3",
+      "queries": [
+        {
+          "outputWriters": [
+            {
+              "@class": "com.googlecode.jmxtrans.model.output.kafka.KafkaWriterFactory",
+              "producerConfig": { "bootstrap.servers": "kafka1:9092" },
+                       "topic": "JMX",
+              "resultSerializer": { "@class": "com.googlecode.jmxtrans.model.output.kafka.DetailedResultSerializer" } 
+            } ],
+                   "obj": "kafka.server:type=BrokerTopicMetrics,name=*,topic=GDE*",
+           "attr": [ "Value","Count","OneMinuteRate" ],
+           "resultAlias":"GDE"
+        }
+      ]
+    }
+  ] }

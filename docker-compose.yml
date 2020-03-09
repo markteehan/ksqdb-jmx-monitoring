@@ -171,7 +171,8 @@ services:
       - -c
       - |
         echo "Installing Connector"
-        confluent-hub install --no-prompt confluentinc/kafka-connect-jdbc:5.4.0
+        confluent-hub install --no-prompt confluentinc/kafka-connect-influxdb:1.1.2
+        confluent-hub install --no-prompt jcustenborder/kafka-connect-spooldir:1.0.37
         confluent-hub install --no-prompt jcustenborder/kafka-connect-spooldir:1.0.37
         #
         echo "Launching Kafka Connect worker"
@@ -203,18 +204,41 @@ services:
     volumes:
       - ./data/grafana:/var/lib/grafana
 
+  jmx-file:
+     image: jmxtrans/jmxtrans:latest
+     depends_on:
+       - kafka3
+     container_name: jmx-file
+     environment:
+       - SECONDS_BETWEEN_RUNS=3
+     volumes:
+      - ./config/file.json:/var/lib/jmxtrans/jmx.json
+
+#!#  jmx-influxdb:
+#!#     image: jmxtrans/jmxtrans:latest
+#!#     depends_on:
+#!#       - influxdb
+#!#       - kafka1
+#!#     container_name: jmx-influxdb
+#!#     environment:
+#!#       - SECONDS_BETWEEN_RUNS=5
+#!#     volumes:
+#!#      - ./config/influxdb.json:/var/lib/jmxtrans/jmx.json
+ 
   jmx-kafka:
      image: jmxtrans/jmxtrans:latest
      depends_on:
-       - influxdb
-       - ksqldb-gde
-       - kafka1
+       - kafka3
      container_name: jmx-kafka
      environment:
        - SECONDS_BETWEEN_RUNS=5
      volumes:
       - ./config/kafka.json:/var/lib/jmxtrans/jmx.json
  
+  influxdb:
+     image: influxdb:1.1.0-alpine
+     container_name: influxdb
+     ports:
   influxdb:
      image: influxdb:1.1.0-alpine
      container_name: influxdb

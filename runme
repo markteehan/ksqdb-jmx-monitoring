@@ -22,6 +22,10 @@ Pause()
 
 
 clear
+echo "Check status - is everything up?"
+docker-compose ps
+Pause
+
 echo "Initializing and restarting"
 sleep 2
 echo :"Truncate, drop, create table in postgres:"
@@ -57,6 +61,63 @@ CMD=`cat /tmp/cmd.sql`
 set -x
 docker exec -it ksqldb-cli bash -c "echo \"${CMD}\" |  ksql http://ksqldb-gde:8088"
 set +x
+Pause
+
+
+cat <<EOF >/tmp/cmd.sql
+CREATE STREAM S_JMX_ALL_RAW (HOST VARCHAR,PORT VARCHAR,SOURCE VARCHAR, ATTRIBUTENAME VARCHAR, CLASSNAME VARCHAR,OBJDOMAIN VARCHAR, TYPENAME VARCHAR,TYPENAMEMAP VARCHAR,EPOCH VARCHAR,VALUEPATH varchar,VALUE BIGINT) WITH (kafka_topic='JMX',value_format='JSON');
+
+CREATE STREAM S_JMX_ALL WITH (KAFKA_TOPIC='S_JMX_ALL',VALUE_FORMAT='AVRO',PARTITIONS=2) AS 
+SELECT * FROM S_JMX_ALL_RAW EMIT CHANGES;
+EOF
+CMD=`cat /tmp/cmd.sql`
+set -x
+docker exec -it ksqldb-cli bash -c "echo \"${CMD}\" |  ksql http://ksqldb-gde:8088"
+set +x
+Pause
+
+cat <<EOF
+create stream S_GDE_JMX AS 
+select 
+ case when (substring(TYPENAME,01,23)='type=BrokerTopicMetrics'and substring(TYPENAME,30,16)='MessagesInPerSec') then 'MessagesInPerSec' 
+      else 'undefinedJMX'
+       end AS TYPENAME
+,case when (substring(TYPENAME,01,23)='type=BrokerTopicMetrics' and substring(TYPENAME,30,16)='MessagesInPerSec') then substring(TYPENAME,53,150)
+      else 'undefinedTopic'
+       end AS topic_name
+, value 
+from S_JMX_ALL;
+EOF
+
+cat <<EOF>/tmp/cmd.sql
+create stream S_GDE_JMX AS select case when (substring(TYPENAME,01,23)='type=BrokerTopicMetrics'and substring(TYPENAME,30,16)='MessagesInPerSec') then 'MessagesInPerSec' else 'undefinedJMX' end AS TYPENAME ,case when (substring(TYPENAME,01,23)='type=BrokerTopicMetrics' and substring(TYPENAME,30,16)='MessagesInPerSec') then substring(TYPENAME,53,150) else 'undefinedTopic' end AS topic_name , value from S_JMX_ALL_RAW;
+EOF
+CMD=`cat /tmp/cmd.sql`
+set -x
+docker exec -it ksqldb-cli bash -c "echo \"${CMD}\" |  ksql http://ksqldb-gde:8088"
+set +x
+Pause
+
+
+cat <<EOF >/tmp/cmd.sql
+CREATE STREAM S_GDE_JMX_MESSAGES_IN_PERSEC AS select Value, typename, topic_name from S_GDE_JMX where TYPENAME='MessagesInPerSec' and Value>0 emit changes;
+EOF
+CMD=`cat /tmp/cmd.sql`
+set -x
+docker exec -it ksqldb-cli bash -c "echo \"${CMD}\" |  ksql http://ksqldb-gde:8088"
+set +x
+Pause
+
+
+cat <<EOF >/tmp/cmd.sql
+CREATE SINK CONNECTOR sinkinflux_${DT2} WITH ( 'connector.class'='io.confluent.influxdb.InfluxDBSinkConnector','tasks.max'='1','topics'='S_GDE_JMX_MESSAGES_IN_PERSEC','influxdb.url'='http://influxdb:8086', 'influxdb.db'='influxdb','influx.db.username'='root','influxdb.password'='root','measurement.name.format'='\${topic}');
+
+EOF
+CMD=`cat /tmp/cmd.sql`
+set -x
+docker exec -it ksqldb-cli bash -c "echo \"${CMD}\" |  ksql http://ksqldb-gde:8088"
+set +x
+
 
 Pause
 cat <<EOF >/tmp/cmd.sql
