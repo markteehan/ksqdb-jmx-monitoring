@@ -2,6 +2,19 @@
 
 This repo demonstrates monitoring a kSQL pipeline using a Grafana dashboard.
 
+JMX metrics, like kittens, require an element of mustering.
+
+kSQLDB and Grafana, paired with jmxtrans and Kafka offer a pipeline toolkit to capture, filter and depict JMX metrics at scale. 
+One beneficiary of this is topic-level monitoring of streaming pipelines; where message produce metrics at the topic level can be used to determine the health of a stream processing application.
+
+This topology offers other benefits:
+* ship all JMX metrics into a kafka topic using jmxtrans wildcards; for all classes, objects and topic names.
+* This requires regular jmxtrans container restarts to pick up new topics
+* Use the native jmxtrans Kafka producer to stream JSON messages for wildcarded metric definitions, for each JVM server
+* Create filter streams using kSQLDB to reduce the message pipelines to logical units: such as metrics for a stream processing applications. Largely using CASE and SUBSTR() predicates
+* Use a kSQLDB Sink Connector to stream kSQLDB metric streams to influxDB measurements, and onwards to Grafana
+* See "runme" for the complete pipeline; including "GDE" - a news-story processing streaming application.
+
 ![ Topology](images/topology.png)
 
 
@@ -11,8 +24,8 @@ docker-compose.yml - docker compose yaml for all containers
              runme - a shell script to initialize all objects, load data and create the streaming pipeline
            getNews - a shell script to pull more test data from data.gdeltproject.org
           loadNews - a shell script to load bundled test data from data/gdelt (102 files; 186,189 news stories)
- config/kafka.json - a jmxtrans config file to extract nominated jmx metrics from the kafka brokers.
-      ksqlapp.json - a grafana dashboard
+ config/kafka.json - a jmxtrans config file to extract nominated jmx metrics and push to a kafka topic JMX
+      ksqlapp.json - a grafana dashboard (not integrated with the current release)
               data - data subdirectories for postgres, influx and grafana
 
 
