@@ -5,6 +5,7 @@ This repo demonstrates monitoring a kSQL pipeline using a Grafana dashboard.
 JMX metrics, like kittens, require an element of mustering.
 
 kSQLDB and Grafana, paired with jmxtrans and Kafka offer a pipeline toolkit to capture, filter and depict JMX metrics at scale. 
+JMXTrans sends all JVM metrics to a kafka topic where kSQLDB filters, transforms and sinks whats needed to influxdb.
 One beneficiary of this is topic-level monitoring of streaming pipelines; where message produce metrics at the topic level can be used to determine the health of a stream processing application.
 
 This topology offers other benefits:
