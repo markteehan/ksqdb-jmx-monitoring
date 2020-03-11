@@ -198,42 +198,39 @@ services:
       - influxdb
     ports:
       - "3000:3000"
-    environment:
-      - GF_PATHS_DATA=/var/lib/grafana
-      - GF_DEFAULT_THEME=light
-    volumes:
-      - ./data/grafana:/var/lib/grafana
 
-  jmx-file:
+#!#  jmx-file:
+#!#     image: jmxtrans/jmxtrans:latest
+#!#     depends_on:
+#!#       - kafka3
+#!#     container_name: jmx-file
+#!#     environment:
+#!#       - SECONDS_BETWEEN_RUNS=3
+#!#     volumes:
+#!#      - ./config/file.json:/var/lib/jmxtrans/jmx.json
+
+  jmx-influxdb:
      image: jmxtrans/jmxtrans:latest
      depends_on:
+       - influxdb
        - kafka3
-     container_name: jmx-file
+       - kafka2
+       - kafka1
+     container_name: jmx-influxdb
      environment:
        - SECONDS_BETWEEN_RUNS=3
      volumes:
-      - ./config/file.json:/var/lib/jmxtrans/jmx.json
-
-#!#  jmx-influxdb:
+      - ./config/influxdb2.json:/var/lib/jmxtrans/jmx.json
+ 
+#!#  jmx-kafka:
 #!#     image: jmxtrans/jmxtrans:latest
 #!#     depends_on:
-#!#       - influxdb
-#!#       - kafka1
-#!#     container_name: jmx-influxdb
+#!#       - kafka3
+#!#     container_name: jmx-kafka
 #!#     environment:
 #!#       - SECONDS_BETWEEN_RUNS=5
 #!#     volumes:
-#!#      - ./config/influxdb.json:/var/lib/jmxtrans/jmx.json
- 
-  jmx-kafka:
-     image: jmxtrans/jmxtrans:latest
-     depends_on:
-       - kafka3
-     container_name: jmx-kafka
-     environment:
-       - SECONDS_BETWEEN_RUNS=5
-     volumes:
-      - ./config/kafka.json:/var/lib/jmxtrans/jmx.json
+#!#      - ./config/kafka.json:/var/lib/jmxtrans/jmx.json
  
   influxdb:
      image: influxdb:1.1.0-alpine
