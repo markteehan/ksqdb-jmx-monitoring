@@ -35,6 +35,9 @@
             "last"
           ],
           "defaults": {
+            "color": {
+              "mode": "thresholds"
+            },
             "decimals": 0,
             "mappings": [
               {
@@ -48,26 +51,29 @@
             "max": 300,
             "min": 0,
             "nullValueMode": "connected",
-            "thresholds": [
-              {
-                "color": "green",
-                "value": null
-              },
-              {
-                "color": "red",
-                "value": 250
-              }
-            ],
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "green",
+                  "value": null
+                },
+                {
+                  "color": "red",
+                  "value": 250
+                }
+              ]
+            },
             "unit": "none"
           },
-          "override": {},
+          "overrides": [],
           "values": false
         },
         "orientation": "horizontal",
         "showThresholdLabels": false,
         "showThresholdMarkers": false
       },
-      "pluginVersion": "6.5.2",
+      "pluginVersion": "6.6.2",
       "targets": [
         {
           "alias": "000_TOPIC",
@@ -85,7 +91,7 @@
               "type": "fill"
             }
           ],
-          "measurement": "MessagesInPerSec",
+          "measurement": "GDE_Metrics",
           "orderByTime": "ASC",
           "policy": "default",
           "query": "SELECT last(\"OneMinuteRate\") FROM \"MessagesInPerSec\" WHERE (\"typeName\" = 'type=BrokerTopicMetrics,name=MessagesInPerSec,topic=GDE_000_A_gdelt_event') AND $timeFilter GROUP BY time($__interval) fill(0)",
@@ -386,12 +392,12 @@
             },
             {
               "params": [
-                "null"
+                "none"
               ],
               "type": "fill"
             }
           ],
-          "measurement": "MessagesInPerSec",
+          "measurement": "GDE_Metrics",
           "orderByTime": "ASC",
           "policy": "default",
           "refId": "A",
@@ -400,7 +406,7 @@
             [
               {
                 "params": [
-                  "Count"
+                  "OneMinuteRate"
                 ],
                 "type": "field"
               },
@@ -439,16 +445,18 @@
       },
       "yaxes": [
         {
-          "format": "short",
-          "label": null,
+          "decimals": 0,
+          "format": "none",
+          "label": "",
           "logBase": 1,
           "max": null,
           "min": null,
           "show": true
         },
         {
+          "decimals": 0,
           "format": "short",
-          "label": null,
+          "label": "",
           "logBase": 1,
           "max": null,
           "min": null,
@@ -516,7 +524,7 @@
               "type": "fill"
             }
           ],
-          "measurement": "MessagesInPerSec",
+          "measurement": "GDE_Metrics",
           "orderByTime": "ASC",
           "policy": "default",
           "refId": "A",
@@ -525,7 +533,7 @@
             [
               {
                 "params": [
-                  "Count"
+                  "OneMinuteRate"
                 ],
                 "type": "field"
               },
@@ -640,7 +648,7 @@
               "type": "fill"
             }
           ],
-          "measurement": "MessagesInPerSec",
+          "measurement": "GDE_Metrics",
           "orderByTime": "ASC",
           "policy": "default",
           "refId": "A",
@@ -649,7 +657,7 @@
             [
               {
                 "params": [
-                  "Count"
+                  "OneMinuteRate"
                 ],
                 "type": "field"
               },
@@ -889,7 +897,7 @@
               "type": "fill"
             }
           ],
-          "measurement": "MessagesInPerSec",
+          "measurement": "GDE_Metrics",
           "orderByTime": "ASC",
           "policy": "default",
           "refId": "A",
@@ -898,7 +906,7 @@
             [
               {
                 "params": [
-                  "Count"
+                  "OneMinuteRate"
                 ],
                 "type": "field"
               },
@@ -1013,7 +1021,7 @@
               "type": "fill"
             }
           ],
-          "measurement": "MessagesInPerSec",
+          "measurement": "GDE_Metrics",
           "orderByTime": "ASC",
           "policy": "default",
           "refId": "A",
@@ -1022,7 +1030,7 @@
             [
               {
                 "params": [
-                  "Count"
+                  "OneMinuteRate"
                 ],
                 "type": "field"
               },
@@ -1084,7 +1092,7 @@
     },
     {
       "aliasColors": {},
-      "bars": true,
+      "bars": false,
       "dashLength": 10,
       "dashes": false,
       "datasource": null,
@@ -1107,7 +1115,7 @@
         "total": false,
         "values": false
       },
-      "lines": false,
+      "lines": true,
       "linewidth": 1,
       "nullPointMode": "null",
       "options": {
@@ -1137,7 +1145,7 @@
               "type": "fill"
             }
           ],
-          "measurement": "MessagesInPerSec",
+          "measurement": "GDE_Metrics",
           "orderByTime": "ASC",
           "policy": "default",
           "refId": "A",
@@ -1146,7 +1154,7 @@
             [
               {
                 "params": [
-                  "Count"
+                  "OneMinuteRate"
                 ],
                 "type": "field"
               },
@@ -1160,7 +1168,7 @@
             {
               "key": "typeName",
               "operator": "=",
-              "value": "type=BrokerTopicMetrics,name=MessagesInPerSec,topic=GDE_060_B_STR_V01"
+              "value": "type=BrokerTopicMetrics,name=MessagesInPerSec,topic=GDE_060_D_STR_V01"
             }
           ]
         }
@@ -1185,8 +1193,9 @@
       },
       "yaxes": [
         {
+          "decimals": 0.1,
           "format": "short",
-          "label": null,
+          "label": "",
           "logBase": 1,
           "max": null,
           "min": null,
@@ -1208,14 +1217,14 @@
     }
   ],
   "refresh": "10s",
-  "schemaVersion": 21,
+  "schemaVersion": 22,
   "style": "dark",
   "tags": [],
   "templating": {
     "list": []
   },
   "time": {
-    "from": "now-5m",
+    "from": "now-30m",
     "to": "now"
   },
   "timepicker": {
@@ -1235,5 +1244,5 @@
   "timezone": "",
   "title": "KBTG3",
   "uid": "u-X4dflWk",
-  "version": 1
+  "version": 4
 }
