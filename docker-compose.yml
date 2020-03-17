@@ -6,6 +6,8 @@ services:
     environment:
       ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_TICK_TIME: 2000
+      ZOOKEEPER_JMX_PORT: 3001
+      ZOOKEEPER_JMX_HOSTNAME: "zookeeper"
 
   kafka1:
     image: confluentinc/cp-enterprise-kafka:5.4.0
@@ -209,19 +211,31 @@ services:
 #!#     volumes:
 #!#      - ./config/file.json:/var/lib/jmxtrans/jmx.json
 
-  jmx-influxdb:
+  jmx-gde:
      image: jmxtrans/jmxtrans:latest
      depends_on:
        - influxdb
        - kafka3
        - kafka2
        - kafka1
-     container_name: jmx-influxdb
+     container_name: jmx-gde
      environment:
        - SECONDS_BETWEEN_RUNS=3
      volumes:
-      - ./config/influxdb2.json:/var/lib/jmxtrans/jmx.json
+      - ./config/gde.json:/var/lib/jmxtrans/jmx.json
  
+  jmx-kafka:
+     image: jmxtrans/jmxtrans:latest
+     depends_on:
+       - kafka1
+       - influxdb
+     container_name: jmx-kafka
+     environment:
+       - SECONDS_BETWEEN_RUNS=3
+     volumes:
+      - ./config/kafka.json:/var/lib/jmxtrans/jmx.json
+
+
 #!#  jmx-kafka:
 #!#     image: jmxtrans/jmxtrans:latest
 #!#     depends_on:
@@ -232,10 +246,7 @@ services:
 #!#     volumes:
 #!#      - ./config/kafka.json:/var/lib/jmxtrans/jmx.json
  
-  influxdb:
-     image: influxdb:1.1.0-alpine
-     container_name: influxdb
-     ports:
+
   influxdb:
      image: influxdb:1.1.0-alpine
      container_name: influxdb

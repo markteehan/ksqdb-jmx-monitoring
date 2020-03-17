@@ -22,9 +22,117 @@
       "cacheTimeout": null,
       "datasource": null,
       "gridPos": {
-        "h": 8,
-        "w": 23,
+        "h": 6,
+        "w": 12,
         "x": 0,
+        "y": 0
+      },
+      "id": 11,
+      "links": [],
+      "options": {
+        "fieldOptions": {
+          "calcs": [
+            "last"
+          ],
+          "defaults": {
+            "color": {
+              "mode": "thresholds"
+            },
+            "decimals": 0,
+            "mappings": [
+              {
+                "id": 0,
+                "op": "=",
+                "text": "N/A",
+                "type": 1,
+                "value": "null"
+              }
+            ],
+            "max": 600,
+            "min": 0,
+            "nullValueMode": "connected",
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "green",
+                  "value": null
+                },
+                {
+                  "color": "red",
+                  "value": 550
+                }
+              ]
+            },
+            "unit": "none"
+          },
+          "overrides": [],
+          "values": false
+        },
+        "orientation": "horizontal",
+        "showThresholdLabels": false,
+        "showThresholdMarkers": false
+      },
+      "pluginVersion": "6.6.2",
+      "targets": [
+        {
+          "alias": "",
+          "groupBy": [
+            {
+              "params": [
+                "$__interval"
+              ],
+              "type": "time"
+            },
+            {
+              "params": [
+                "0"
+              ],
+              "type": "fill"
+            }
+          ],
+          "measurement": "GDE_Metrics",
+          "orderByTime": "ASC",
+          "policy": "default",
+          "query": "SELECT last(\"OneMinuteRate\") FROM \"MessagesInPerSec\" WHERE (\"typeName\" = 'type=BrokerTopicMetrics,name=MessagesInPerSec,topic=GDE_000_A_gdelt_event') AND $timeFilter GROUP BY time($__interval) fill(0)",
+          "rawQuery": false,
+          "refId": "A",
+          "resultFormat": "time_series",
+          "select": [
+            [
+              {
+                "params": [
+                  "OneMinuteRate"
+                ],
+                "type": "field"
+              },
+              {
+                "params": [],
+                "type": "last"
+              }
+            ]
+          ],
+          "tags": [
+            {
+              "key": "typeName",
+              "operator": "=",
+              "value": "type=BrokerTopicMetrics,name=MessagesInPerSec,topic=GDE_000_A_gdelt_event"
+            }
+          ]
+        }
+      ],
+      "timeFrom": null,
+      "timeShift": null,
+      "title": "kSQL node  Messages/Sec (In)",
+      "type": "gauge"
+    },
+    {
+      "cacheTimeout": null,
+      "datasource": null,
+      "gridPos": {
+        "h": 6,
+        "w": 11,
+        "x": 12,
         "y": 0
       },
       "id": 2,
@@ -48,7 +156,7 @@
                 "value": "null"
               }
             ],
-            "max": 300,
+            "max": 80,
             "min": 0,
             "nullValueMode": "connected",
             "thresholds": {
@@ -60,7 +168,7 @@
                 },
                 {
                   "color": "red",
-                  "value": 250
+                  "value": 70
                 }
               ]
             },
@@ -76,7 +184,7 @@
       "pluginVersion": "6.6.2",
       "targets": [
         {
-          "alias": "000_TOPIC",
+          "alias": "",
           "groupBy": [
             {
               "params": [
@@ -116,221 +224,6 @@
             {
               "key": "typeName",
               "operator": "=",
-              "value": "type=BrokerTopicMetrics,name=MessagesInPerSec,topic=GDE_000_A_gdelt_event"
-            }
-          ]
-        },
-        {
-          "alias": "010_STR",
-          "groupBy": [
-            {
-              "params": [
-                "10s"
-              ],
-              "type": "time"
-            },
-            {
-              "params": [
-                "0"
-              ],
-              "type": "fill"
-            }
-          ],
-          "measurement": "MessagesInPerSec",
-          "orderByTime": "ASC",
-          "policy": "default",
-          "refId": "B",
-          "resultFormat": "time_series",
-          "select": [
-            [
-              {
-                "params": [
-                  "Count"
-                ],
-                "type": "field"
-              },
-              {
-                "params": [],
-                "type": "last"
-              }
-            ]
-          ],
-          "tags": [
-            {
-              "key": "typeName",
-              "operator": "=",
-              "value": "010"
-            }
-          ]
-        },
-        {
-          "alias": "020_TAB",
-          "groupBy": [
-            {
-              "params": [
-                "10s"
-              ],
-              "type": "time"
-            },
-            {
-              "params": [
-                "0"
-              ],
-              "type": "fill"
-            }
-          ],
-          "measurement": "MessagesInPerSec",
-          "orderByTime": "ASC",
-          "policy": "default",
-          "refId": "C",
-          "resultFormat": "time_series",
-          "select": [
-            [
-              {
-                "params": [
-                  "OneMinuteRate"
-                ],
-                "type": "field"
-              },
-              {
-                "params": [],
-                "type": "last"
-              }
-            ]
-          ],
-          "tags": [
-            {
-              "key": "typeName",
-              "operator": "=",
-              "value": "type=BrokerTopicMetrics,name=MessagesInPerSec,topic=GDE_020_B_TAB_V01"
-            }
-          ]
-        },
-        {
-          "alias": "040_RKY",
-          "groupBy": [
-            {
-              "params": [
-                "10s"
-              ],
-              "type": "time"
-            },
-            {
-              "params": [
-                "0"
-              ],
-              "type": "fill"
-            }
-          ],
-          "measurement": "MessagesInPerSec",
-          "orderByTime": "ASC",
-          "policy": "default",
-          "refId": "D",
-          "resultFormat": "time_series",
-          "select": [
-            [
-              {
-                "params": [
-                  "OneMinuteRate"
-                ],
-                "type": "field"
-              },
-              {
-                "params": [],
-                "type": "last"
-              }
-            ]
-          ],
-          "tags": [
-            {
-              "key": "typeName",
-              "operator": "=",
-              "value": "type=BrokerTopicMetrics,name=MessagesInPerSec,topic=GDE_040_C_RKY_V01"
-            }
-          ]
-        },
-        {
-          "alias": "050_RKY",
-          "groupBy": [
-            {
-              "params": [
-                "10s"
-              ],
-              "type": "time"
-            },
-            {
-              "params": [
-                "0"
-              ],
-              "type": "fill"
-            }
-          ],
-          "measurement": "MessagesInPerSec",
-          "orderByTime": "ASC",
-          "policy": "default",
-          "refId": "E",
-          "resultFormat": "time_series",
-          "select": [
-            [
-              {
-                "params": [
-                  "OneMinuteRate"
-                ],
-                "type": "field"
-              },
-              {
-                "params": [],
-                "type": "last"
-              }
-            ]
-          ],
-          "tags": [
-            {
-              "key": "typeName",
-              "operator": "=",
-              "value": "type=BrokerTopicMetrics,name=MessagesInPerSec,topic=GDE_050_C_RKY_V01"
-            }
-          ]
-        },
-        {
-          "alias": "060_STR",
-          "groupBy": [
-            {
-              "params": [
-                "10s"
-              ],
-              "type": "time"
-            },
-            {
-              "params": [
-                "0"
-              ],
-              "type": "fill"
-            }
-          ],
-          "measurement": "MessagesInPerSec",
-          "orderByTime": "ASC",
-          "policy": "default",
-          "refId": "F",
-          "resultFormat": "time_series",
-          "select": [
-            [
-              {
-                "params": [
-                  "OneMinuteRate"
-                ],
-                "type": "field"
-              },
-              {
-                "params": [],
-                "type": "last"
-              }
-            ]
-          ],
-          "tags": [
-            {
-              "key": "typeName",
-              "operator": "=",
               "value": "type=BrokerTopicMetrics,name=MessagesInPerSec,topic=GDE_060_D_STR_V01"
             }
           ]
@@ -338,7 +231,7 @@
       ],
       "timeFrom": null,
       "timeShift": null,
-      "title": "kSQL node  Messages/Sec (Current)",
+      "title": "kSQL node  Messages/Sec (Out)",
       "type": "gauge"
     },
     {
@@ -353,7 +246,7 @@
         "h": 6,
         "w": 6,
         "x": 0,
-        "y": 8
+        "y": 6
       },
       "hiddenSeries": false,
       "id": 3,
@@ -480,7 +373,7 @@
         "h": 6,
         "w": 6,
         "x": 6,
-        "y": 8
+        "y": 6
       },
       "hiddenSeries": false,
       "id": 7,
@@ -605,7 +498,7 @@
         "h": 6,
         "w": 6,
         "x": 12,
-        "y": 8
+        "y": 6
       },
       "hiddenSeries": false,
       "id": 8,
@@ -729,7 +622,7 @@
         "h": 6,
         "w": 5,
         "x": 18,
-        "y": 8
+        "y": 6
       },
       "hiddenSeries": false,
       "id": 9,
@@ -854,7 +747,7 @@
         "h": 6,
         "w": 6,
         "x": 0,
-        "y": 14
+        "y": 12
       },
       "hiddenSeries": false,
       "id": 4,
@@ -978,7 +871,7 @@
         "h": 6,
         "w": 6,
         "x": 6,
-        "y": 14
+        "y": 12
       },
       "hiddenSeries": false,
       "id": 5,
@@ -1102,7 +995,7 @@
         "h": 6,
         "w": 6,
         "x": 12,
-        "y": 14
+        "y": 12
       },
       "hiddenSeries": false,
       "id": 6,
@@ -1193,12 +1086,12 @@
       },
       "yaxes": [
         {
-          "decimals": 0.1,
+          "decimals": 0,
           "format": "short",
           "label": "",
           "logBase": 1,
-          "max": null,
-          "min": null,
+          "max": "60",
+          "min": "0",
           "show": true
         },
         {
@@ -1242,7 +1135,7 @@
     ]
   },
   "timezone": "",
-  "title": "KBTG3",
+  "title": "GDELT News",
   "uid": "u-X4dflWk",
-  "version": 4
+  "version": 3
 }

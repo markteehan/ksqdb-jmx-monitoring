@@ -23,7 +23,7 @@ Pause()
 
 
 
-sleep 180
+#sleep 180
 clear
 echo "Check status - is everything up?"
 docker-compose --detach up
@@ -41,6 +41,7 @@ docker-compose -f docker-compose.yml exec postgres bash -c "psql -U postgres pos
 
 Pause
 
+sleep 120
 FILE=20190712181500.export.csv
 echo "Loading  data/gdelt/${FILE} into Postgres ..."
 docker cp data/gdelt/${FILE} Postgres:/var/tmp
