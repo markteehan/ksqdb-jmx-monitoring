@@ -25,7 +25,7 @@ services:
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,HOST:PLAINTEXT
       KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
       KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka1:29092,HOST://kafka1:9092
-      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "false"
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 3
       KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 3
       KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 3
@@ -51,7 +51,7 @@ services:
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,HOST:PLAINTEXT
       KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
       KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka2:29092,HOST://kafka2:9092
-      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "false"
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 3
       KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 3
       KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 3
@@ -77,7 +77,7 @@ services:
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,HOST:PLAINTEXT
       KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
       KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka3:29092,HOST://kafka3:9092
-      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "false"
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 3
       KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 3
       KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 3
@@ -120,6 +120,7 @@ services:
       KSQL_KSQL_CONNECT_URL: http://kafka-connect-01:8083
       KSQL_KSQL_SCHEMA_REGISTRY_URL: http://schema-registry:8081
       KSQL_KSQL_SERVICE_ID: gde01
+      KSQL_KSQL_INTERNAL_TOPIC_REPLICAS: 3
 
   ksqldb-cli:
     image: confluentinc/ksqldb-cli:0.7.1
@@ -196,10 +197,17 @@ services:
 
   grafana:
     image: grafana/grafana:latest
+    container_name: "grafana"
     links:
       - influxdb
+    user: "0"
     ports:
       - "3000:3000"
+    environment:
+      - GF_DEFAULT_THEME=light
+    volumes:
+      - ./data/grafana:/var/lib/grafana
+
 
 #!#  jmx-file:
 #!#     image: jmxtrans/jmxtrans:latest
@@ -250,6 +258,8 @@ services:
   influxdb:
      image: influxdb:1.1.0-alpine
      container_name: influxdb
+     environment:
+      -  INFLUXDB_LOGGING_LEVEL=debug
      ports:
        - 8086:8086
      volumes:
@@ -287,6 +297,17 @@ services:
       CONTROL_CENTER_DEPRECATED_VIEWS_ENABLE: "true"
     volumes:
        - monitoring_interceptors:/usr/share/java/monitoring-interceptors/
+
+  chronograf:
+    image: chronograf:latest
+    volumes:
+      # Mount for chronograf database
+      - ./data/chronograf/:/var/lib/chronograf/
+    ports:
+      # The WebUI for Chronograf is served on port 8888
+      - "8888:8888"
+    depends_on:
+      - influxdb
 
 volumes:
     # This volume is mounted on an image in which the interceptor JARs do exist

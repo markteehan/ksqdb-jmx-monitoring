@@ -15,8 +15,8 @@ run()
 Pause()
 {
   echo;echo "Paused"
-  #read Pause
-  sleep 30
+  read Pause
+  #sleep 30
   clear
   echo;echo
 }
@@ -149,9 +149,44 @@ CMD=`cat /tmp/cmd.sql`
 docker exec -it ksqldb-cli bash -c "echo \"${CMD}\" |  ksql http://ksqldb-gde:8088"
 Pause
 
+THR=D
+SEQ=070
+TYP=STR
+OBJ=${APP}_${SEQ}_${THR}_${TYP}_${REL}
+cat <<EOF >/tmp/cmd.sql
+set 'auto.offset.reset'='earliest';
+CREATE STREAM $OBJ WITH (kafka_topic='$OBJ', value_format='KAFKA',partitions=1,replicas=3) AS SELECT replace(replace(replace('{ "schema":{"type":"struct","fields":[ {"type":"map" ,"keys":{"type":"string","optional":false} ,"values":{"type":"string","optional":false} ,"optional":false,"field":"tags" } ,{"type":"string","optional":false,"field":"time"} ,{"type":"double","optional":true,"field":"value"}] ,"optional":false,"version":1} ,"payload":{"tags":{"id":"REPLACEME_ID"},"time":"REPLACEME_TS","value":REPLACEME_VALUE}}' ,'REPLACEME_ID',ACTOR1COUNTRYCODE),'REPLACEME_TS',cast(rowtime as STRING)),'REPLACEME_VALUE',cast(C_COUNT as STRING)) as influx_json_row FROM GDE_060_D_STR_V01 WHERE ACTOR1COUNTRYCODE>'';
+EOF
+#this cmd has single- and double- quotes so cp it to the container to run it; avoiding shell escaping insanity and hell
+docker cp /tmp/cmd.sql ksqldb-cli:/tmp/cmd.sql
+docker exec -it ksqldb-cli bash -c "ksql http://ksqldb-gde:8088 < /tmp/cmd.sql"
+
+
+Pause
+cat <<EOF >/tmp/cmd.sql
+CREATE SINK CONNECTOR sinkinflux_${DT2} WITH ( 'connector.class'='io.confluent.influxdb.InfluxDBSinkConnector','tasks.max'='1','topics'='GDE_070_D_STR_V01','influxdb.url'='http://influxdb:8086', 'influxdb.db'='gdelt','influx.db.username'='root','influxdb.password'='root','measurement.name.format'='GDE_070_D_STR_V01','value.converter'='org.apache.kafka.connect.json.JsonConverter');
+EOF
+cat /tmp/cmd.sql
+Pause
+CMD=`cat /tmp/cmd.sql`
+set -x
+docker exec -it ksqldb-cli bash -c "echo \"${CMD}\" |  ksql http://ksqldb-gde:8088"
+set +x
+
+
+
+
+
 clear
 echo "Restart the JMX Exporter to start scraping metrics for the new topics"
 docker-compose restart jmx-influxdb
+
+#"2019-07-24T11:43:19.201040841Z"
+
+
+
+
+
 
 FILE=20191205000000.export.csv
 echo "Loading  data/gdelt/${FILE} into Postgres ..."
