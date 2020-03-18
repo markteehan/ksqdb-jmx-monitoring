@@ -1,0 +1,705 @@
+{
+	"meta": {
+		"chronografVersion": "1.8.0",
+		"sources": {
+			"1": {
+				"name": "Influx 1",
+				"link": "/chronograf/v1/sources/1"
+			}
+		}
+	},
+	"dashboard": {
+		"id": "1",
+		"cells": [
+			{
+				"i": "e6996126-dc7f-4257-a19e-ed6d39582b36",
+				"x": 4,
+				"y": 4,
+				"w": 4,
+				"h": 4,
+				"name": "GDE_060",
+				"queries": [
+					{
+						"query": "SELECT mean(\"OneMinuteRate\") AS \"mean_OneMinuteRate\" FROM \"gde-db\".\"autogen\".\"GDE_Metrics\" WHERE time > :dashboardTime: AND time < :upperDashboardTime: AND (\"typeName\"='type=BrokerTopicMetrics,name=MessagesInPerSec,topic=GDE_060_D_STR_V01') GROUP BY time(:interval:) FILL(null)",
+						"queryConfig": {
+							"database": "gde-db",
+							"measurement": "GDE_Metrics",
+							"retentionPolicy": "autogen",
+							"fields": [
+								{
+									"value": "mean",
+									"type": "func",
+									"alias": "mean_OneMinuteRate",
+									"args": [
+										{
+											"value": "OneMinuteRate",
+											"type": "field",
+											"alias": ""
+										}
+									]
+								}
+							],
+							"tags": {
+								"typeName": [
+									"type=BrokerTopicMetrics,name=MessagesInPerSec,topic=GDE_060_D_STR_V01"
+								]
+							},
+							"groupBy": {
+								"time": "auto",
+								"tags": []
+							},
+							"areTagsAccepted": true,
+							"fill": "null",
+							"rawText": null,
+							"range": null,
+							"shifts": null
+						},
+						"source": "/chronograf/v1/sources/1",
+						"type": "influxql"
+					}
+				],
+				"axes": {
+					"x": {
+						"bounds": [
+							"",
+							""
+						],
+						"label": "",
+						"prefix": "",
+						"suffix": "",
+						"base": "10",
+						"scale": "linear"
+					},
+					"y": {
+						"bounds": [
+							"",
+							""
+						],
+						"label": "",
+						"prefix": "",
+						"suffix": "",
+						"base": "10",
+						"scale": "linear"
+					},
+					"y2": {
+						"bounds": [
+							"",
+							""
+						],
+						"label": "",
+						"prefix": "",
+						"suffix": "",
+						"base": "10",
+						"scale": "linear"
+					}
+				},
+				"type": "line",
+				"colors": [
+					{
+						"id": "fe47c693-6bed-43a9-b530-2e332f77330b",
+						"type": "scale",
+						"hex": "#31C0F6",
+						"name": "Nineteen Eighty Four",
+						"value": "0"
+					},
+					{
+						"id": "4df500a0-2471-4a2b-852d-7dbb131574c5",
+						"type": "scale",
+						"hex": "#A500A5",
+						"name": "Nineteen Eighty Four",
+						"value": "0"
+					},
+					{
+						"id": "609f7c51-172f-4a3e-9ab1-1950188713a1",
+						"type": "scale",
+						"hex": "#FF7E27",
+						"name": "Nineteen Eighty Four",
+						"value": "0"
+					}
+				],
+				"legend": {},
+				"tableOptions": {
+					"verticalTimeAxis": true,
+					"sortBy": {
+						"internalName": "time",
+						"displayName": "",
+						"visible": true
+					},
+					"wrapping": "truncate",
+					"fixFirstColumn": true
+				},
+				"fieldOptions": [
+					{
+						"internalName": "time",
+						"displayName": "",
+						"visible": true
+					}
+				],
+				"timeFormat": "MM/DD/YYYY HH:mm:ss",
+				"decimalPlaces": {
+					"isEnforced": true,
+					"digits": 2
+				},
+				"note": "",
+				"noteVisibility": "default",
+				"links": {
+					"self": "/chronograf/v1/dashboards/1/cells/e6996126-dc7f-4257-a19e-ed6d39582b36"
+				}
+			},
+			{
+				"i": "ff4dfc0e-7cfe-48ca-aa16-e215ab8c0878",
+				"x": 4,
+				"y": 0,
+				"w": 4,
+				"h": 4,
+				"name": "GDE_040 (clone 1)",
+				"queries": [
+					{
+						"query": "SELECT mean(\"OneMinuteRate\") AS \"mean_OneMinuteRate\" FROM \"gde-db\".\"autogen\".\"GDE_Metrics\" WHERE time > :dashboardTime: AND time < :upperDashboardTime: AND (\"typeName\"='type=BrokerTopicMetrics,name=MessagesInPerSec,topic=' OR \"typeName\"='type=BrokerTopicMetrics,name=MessagesInPerSec,topic=GDE_020_B_TAB_V01' OR \"typeName\"='type=BrokerTopicMetrics,name=MessagesInPerSec,topic=GDE_040_C_RKY_V01') GROUP BY time(:interval:) FILL(null)",
+						"queryConfig": {
+							"database": "gde-db",
+							"measurement": "GDE_Metrics",
+							"retentionPolicy": "autogen",
+							"fields": [
+								{
+									"value": "mean",
+									"type": "func",
+									"alias": "mean_OneMinuteRate",
+									"args": [
+										{
+											"value": "OneMinuteRate",
+											"type": "field",
+											"alias": ""
+										}
+									]
+								}
+							],
+							"tags": {
+								"typeName": [
+									"type=BrokerTopicMetrics,name=MessagesInPerSec,topic=",
+									"type=BrokerTopicMetrics,name=MessagesInPerSec,topic=GDE_020_B_TAB_V01",
+									"type=BrokerTopicMetrics,name=MessagesInPerSec,topic=GDE_040_C_RKY_V01"
+								]
+							},
+							"groupBy": {
+								"time": "auto",
+								"tags": []
+							},
+							"areTagsAccepted": true,
+							"fill": "null",
+							"rawText": null,
+							"range": null,
+							"shifts": null
+						},
+						"source": "/chronograf/v1/sources/1",
+						"type": "influxql"
+					}
+				],
+				"axes": {
+					"x": {
+						"bounds": [
+							"",
+							""
+						],
+						"label": "",
+						"prefix": "",
+						"suffix": "",
+						"base": "10",
+						"scale": "linear"
+					},
+					"y": {
+						"bounds": [
+							"",
+							""
+						],
+						"label": "",
+						"prefix": "",
+						"suffix": "",
+						"base": "10",
+						"scale": "linear"
+					},
+					"y2": {
+						"bounds": [
+							"",
+							""
+						],
+						"label": "",
+						"prefix": "",
+						"suffix": "",
+						"base": "10",
+						"scale": "linear"
+					}
+				},
+				"type": "line",
+				"colors": [
+					{
+						"id": "fe47c693-6bed-43a9-b530-2e332f77330b",
+						"type": "scale",
+						"hex": "#31C0F6",
+						"name": "Nineteen Eighty Four",
+						"value": "0"
+					},
+					{
+						"id": "4df500a0-2471-4a2b-852d-7dbb131574c5",
+						"type": "scale",
+						"hex": "#A500A5",
+						"name": "Nineteen Eighty Four",
+						"value": "0"
+					},
+					{
+						"id": "609f7c51-172f-4a3e-9ab1-1950188713a1",
+						"type": "scale",
+						"hex": "#FF7E27",
+						"name": "Nineteen Eighty Four",
+						"value": "0"
+					}
+				],
+				"legend": {},
+				"tableOptions": {
+					"verticalTimeAxis": true,
+					"sortBy": {
+						"internalName": "time",
+						"displayName": "",
+						"visible": true
+					},
+					"wrapping": "truncate",
+					"fixFirstColumn": true
+				},
+				"fieldOptions": [
+					{
+						"internalName": "time",
+						"displayName": "",
+						"visible": true
+					}
+				],
+				"timeFormat": "MM/DD/YYYY HH:mm:ss",
+				"decimalPlaces": {
+					"isEnforced": true,
+					"digits": 2
+				},
+				"note": "",
+				"noteVisibility": "default",
+				"links": {
+					"self": "/chronograf/v1/dashboards/1/cells/ff4dfc0e-7cfe-48ca-aa16-e215ab8c0878"
+				}
+			},
+			{
+				"i": "36efde0b-f543-44df-bd8a-a203d9defad8",
+				"x": 8,
+				"y": 0,
+				"w": 4,
+				"h": 4,
+				"name": "GDE_040",
+				"queries": [
+					{
+						"query": "SELECT mean(\"OneMinuteRate\") AS \"mean_OneMinuteRate\" FROM \"gde-db\".\"autogen\".\"GDE_Metrics\" WHERE time > :dashboardTime: AND time < :upperDashboardTime: AND (\"typeName\"='type=BrokerTopicMetrics,name=MessagesInPerSec,topic=' OR \"typeName\"='type=BrokerTopicMetrics,name=MessagesInPerSec,topic=GDE_020_B_TAB_V01' OR \"typeName\"='type=BrokerTopicMetrics,name=MessagesInPerSec,topic=GDE_040_C_RKY_V01') GROUP BY time(:interval:) FILL(null)",
+						"queryConfig": {
+							"database": "gde-db",
+							"measurement": "GDE_Metrics",
+							"retentionPolicy": "autogen",
+							"fields": [
+								{
+									"value": "mean",
+									"type": "func",
+									"alias": "mean_OneMinuteRate",
+									"args": [
+										{
+											"value": "OneMinuteRate",
+											"type": "field",
+											"alias": ""
+										}
+									]
+								}
+							],
+							"tags": {
+								"typeName": [
+									"type=BrokerTopicMetrics,name=MessagesInPerSec,topic=",
+									"type=BrokerTopicMetrics,name=MessagesInPerSec,topic=GDE_020_B_TAB_V01",
+									"type=BrokerTopicMetrics,name=MessagesInPerSec,topic=GDE_040_C_RKY_V01"
+								]
+							},
+							"groupBy": {
+								"time": "auto",
+								"tags": []
+							},
+							"areTagsAccepted": true,
+							"fill": "null",
+							"rawText": null,
+							"range": null,
+							"shifts": null
+						},
+						"source": "/chronograf/v1/sources/1",
+						"type": "influxql"
+					}
+				],
+				"axes": {
+					"x": {
+						"bounds": [
+							"",
+							""
+						],
+						"label": "",
+						"prefix": "",
+						"suffix": "",
+						"base": "10",
+						"scale": "linear"
+					},
+					"y": {
+						"bounds": [
+							"",
+							""
+						],
+						"label": "",
+						"prefix": "",
+						"suffix": "",
+						"base": "10",
+						"scale": "linear"
+					},
+					"y2": {
+						"bounds": [
+							"",
+							""
+						],
+						"label": "",
+						"prefix": "",
+						"suffix": "",
+						"base": "10",
+						"scale": "linear"
+					}
+				},
+				"type": "line",
+				"colors": [
+					{
+						"id": "fe47c693-6bed-43a9-b530-2e332f77330b",
+						"type": "scale",
+						"hex": "#31C0F6",
+						"name": "Nineteen Eighty Four",
+						"value": "0"
+					},
+					{
+						"id": "4df500a0-2471-4a2b-852d-7dbb131574c5",
+						"type": "scale",
+						"hex": "#A500A5",
+						"name": "Nineteen Eighty Four",
+						"value": "0"
+					},
+					{
+						"id": "609f7c51-172f-4a3e-9ab1-1950188713a1",
+						"type": "scale",
+						"hex": "#FF7E27",
+						"name": "Nineteen Eighty Four",
+						"value": "0"
+					}
+				],
+				"legend": {},
+				"tableOptions": {
+					"verticalTimeAxis": true,
+					"sortBy": {
+						"internalName": "time",
+						"displayName": "",
+						"visible": true
+					},
+					"wrapping": "truncate",
+					"fixFirstColumn": true
+				},
+				"fieldOptions": [
+					{
+						"internalName": "time",
+						"displayName": "",
+						"visible": true
+					}
+				],
+				"timeFormat": "MM/DD/YYYY HH:mm:ss",
+				"decimalPlaces": {
+					"isEnforced": true,
+					"digits": 2
+				},
+				"note": "",
+				"noteVisibility": "default",
+				"links": {
+					"self": "/chronograf/v1/dashboards/1/cells/36efde0b-f543-44df-bd8a-a203d9defad8"
+				}
+			},
+			{
+				"i": "6f6705ca-0dde-44ed-83f9-28d397267314",
+				"x": 0,
+				"y": 4,
+				"w": 4,
+				"h": 4,
+				"name": "GDE_050",
+				"queries": [
+					{
+						"query": "SELECT mean(\"OneMinuteRate\") AS \"mean_OneMinuteRate\" FROM \"gde-db\".\"autogen\".\"GDE_Metrics\" WHERE time > :dashboardTime: AND time < :upperDashboardTime: AND (\"typeName\"='type=BrokerTopicMetrics,name=MessagesInPerSec,topic=' OR \"typeName\"='type=BrokerTopicMetrics,name=MessagesInPerSec,topic=GDE_020_B_TAB_V01' OR \"typeName\"='type=BrokerTopicMetrics,name=MessagesInPerSec,topic=GDE_050_C_RKY_V01') GROUP BY time(:interval:) FILL(null)",
+						"queryConfig": {
+							"database": "gde-db",
+							"measurement": "GDE_Metrics",
+							"retentionPolicy": "autogen",
+							"fields": [
+								{
+									"value": "mean",
+									"type": "func",
+									"alias": "mean_OneMinuteRate",
+									"args": [
+										{
+											"value": "OneMinuteRate",
+											"type": "field",
+											"alias": ""
+										}
+									]
+								}
+							],
+							"tags": {
+								"typeName": [
+									"type=BrokerTopicMetrics,name=MessagesInPerSec,topic=",
+									"type=BrokerTopicMetrics,name=MessagesInPerSec,topic=GDE_020_B_TAB_V01",
+									"type=BrokerTopicMetrics,name=MessagesInPerSec,topic=GDE_050_C_RKY_V01"
+								]
+							},
+							"groupBy": {
+								"time": "auto",
+								"tags": []
+							},
+							"areTagsAccepted": true,
+							"fill": "null",
+							"rawText": null,
+							"range": null,
+							"shifts": null
+						},
+						"source": "/chronograf/v1/sources/1",
+						"type": "influxql"
+					}
+				],
+				"axes": {
+					"x": {
+						"bounds": [
+							"",
+							""
+						],
+						"label": "",
+						"prefix": "",
+						"suffix": "",
+						"base": "10",
+						"scale": "linear"
+					},
+					"y": {
+						"bounds": [
+							"",
+							""
+						],
+						"label": "",
+						"prefix": "",
+						"suffix": "",
+						"base": "10",
+						"scale": "linear"
+					},
+					"y2": {
+						"bounds": [
+							"",
+							""
+						],
+						"label": "",
+						"prefix": "",
+						"suffix": "",
+						"base": "10",
+						"scale": "linear"
+					}
+				},
+				"type": "line",
+				"colors": [
+					{
+						"id": "fe47c693-6bed-43a9-b530-2e332f77330b",
+						"type": "scale",
+						"hex": "#31C0F6",
+						"name": "Nineteen Eighty Four",
+						"value": "0"
+					},
+					{
+						"id": "4df500a0-2471-4a2b-852d-7dbb131574c5",
+						"type": "scale",
+						"hex": "#A500A5",
+						"name": "Nineteen Eighty Four",
+						"value": "0"
+					},
+					{
+						"id": "609f7c51-172f-4a3e-9ab1-1950188713a1",
+						"type": "scale",
+						"hex": "#FF7E27",
+						"name": "Nineteen Eighty Four",
+						"value": "0"
+					}
+				],
+				"legend": {},
+				"tableOptions": {
+					"verticalTimeAxis": true,
+					"sortBy": {
+						"internalName": "time",
+						"displayName": "",
+						"visible": true
+					},
+					"wrapping": "truncate",
+					"fixFirstColumn": true
+				},
+				"fieldOptions": [
+					{
+						"internalName": "time",
+						"displayName": "",
+						"visible": true
+					}
+				],
+				"timeFormat": "MM/DD/YYYY HH:mm:ss",
+				"decimalPlaces": {
+					"isEnforced": true,
+					"digits": 2
+				},
+				"note": "",
+				"noteVisibility": "default",
+				"links": {
+					"self": "/chronograf/v1/dashboards/1/cells/6f6705ca-0dde-44ed-83f9-28d397267314"
+				}
+			},
+			{
+				"i": "e6bc7fa5-4273-4b4f-8c63-bd20df986ca2",
+				"x": 0,
+				"y": 0,
+				"w": 4,
+				"h": 4,
+				"name": "GDE_000",
+				"queries": [
+					{
+						"query": "SELECT mean(\"OneMinuteRate\") AS \"mean_OneMinuteRate\" FROM \"gde-db\".\"autogen\".\"GDE_Metrics\" WHERE time > :dashboardTime: AND time < :upperDashboardTime: AND \"typeName\"='type=BrokerTopicMetrics,name=MessagesInPerSec,topic=GDE_000_A_gdelt_event' GROUP BY time(:interval:) FILL(null)",
+						"queryConfig": {
+							"database": "gde-db",
+							"measurement": "GDE_Metrics",
+							"retentionPolicy": "autogen",
+							"fields": [
+								{
+									"value": "mean",
+									"type": "func",
+									"alias": "mean_OneMinuteRate",
+									"args": [
+										{
+											"value": "OneMinuteRate",
+											"type": "field",
+											"alias": ""
+										}
+									]
+								}
+							],
+							"tags": {
+								"typeName": [
+									"type=BrokerTopicMetrics,name=MessagesInPerSec,topic=GDE_000_A_gdelt_event"
+								]
+							},
+							"groupBy": {
+								"time": "auto",
+								"tags": []
+							},
+							"areTagsAccepted": true,
+							"fill": "null",
+							"rawText": null,
+							"range": null,
+							"shifts": null
+						},
+						"source": "/chronograf/v1/sources/1",
+						"type": "influxql"
+					}
+				],
+				"axes": {
+					"x": {
+						"bounds": [
+							"",
+							""
+						],
+						"label": "",
+						"prefix": "",
+						"suffix": "",
+						"base": "10",
+						"scale": "linear"
+					},
+					"y": {
+						"bounds": [
+							"",
+							""
+						],
+						"label": "",
+						"prefix": "",
+						"suffix": "",
+						"base": "10",
+						"scale": "linear"
+					},
+					"y2": {
+						"bounds": [
+							"",
+							""
+						],
+						"label": "",
+						"prefix": "",
+						"suffix": "",
+						"base": "10",
+						"scale": "linear"
+					}
+				},
+				"type": "line",
+				"colors": [
+					{
+						"id": "fe47c693-6bed-43a9-b530-2e332f77330b",
+						"type": "scale",
+						"hex": "#31C0F6",
+						"name": "Nineteen Eighty Four",
+						"value": "0"
+					},
+					{
+						"id": "4df500a0-2471-4a2b-852d-7dbb131574c5",
+						"type": "scale",
+						"hex": "#A500A5",
+						"name": "Nineteen Eighty Four",
+						"value": "0"
+					},
+					{
+						"id": "609f7c51-172f-4a3e-9ab1-1950188713a1",
+						"type": "scale",
+						"hex": "#FF7E27",
+						"name": "Nineteen Eighty Four",
+						"value": "0"
+					}
+				],
+				"legend": {},
+				"tableOptions": {
+					"verticalTimeAxis": true,
+					"sortBy": {
+						"internalName": "time",
+						"displayName": "",
+						"visible": true
+					},
+					"wrapping": "truncate",
+					"fixFirstColumn": true
+				},
+				"fieldOptions": [
+					{
+						"internalName": "time",
+						"displayName": "",
+						"visible": true
+					}
+				],
+				"timeFormat": "MM/DD/YYYY HH:mm:ss",
+				"decimalPlaces": {
+					"isEnforced": true,
+					"digits": 2
+				},
+				"note": "",
+				"noteVisibility": "default",
+				"links": {
+					"self": "/chronograf/v1/dashboards/1/cells/e6bc7fa5-4273-4b4f-8c63-bd20df986ca2"
+				}
+			}
+		],
+		"templates": [],
+		"name": "GDE",
+		"organization": "default",
+		"links": {
+			"self": "/chronograf/v1/dashboards/1",
+			"cells": "/chronograf/v1/dashboards/1/cells",
+			"templates": "/chronograf/v1/dashboards/1/templates"
+		}
+	}
+}
