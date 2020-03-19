@@ -10,7 +10,6 @@
 
 getNews()
 {
-set -x
 cd data/gdelt
 TS=`date +"%Y%m%d"`
 YEAR="2020"
@@ -41,8 +40,6 @@ do
           rm -f ${FILE}.CSV.zip
           curl -O http://data.gdeltproject.org/gdeltv2/${FILE}.CSV.zip
           RET=$?
-          ls -l ${FILE}.CSV.zip
-          echo Paused ; read Pause
           if [ "$RET" = "0" ]
           then
             unzip ${FILE}.CSV.zip 1>/dev/null 2>&1

@@ -142,9 +142,9 @@ services:
       - postgres
     ports:
       - 8083:8083
-      - 3003:3003
     environment:
-      JMX_PORT: 3003
+      JMX_PORT: 3001
+      JMX_HOSTNAME: kafka-connect-01
       CONNECT_LOG4J_APPENDER_STDOUT_LAYOUT_CONVERSIONPATTERN: "[%d] %p %X{connector.context}%m (%c:%L)%n"
       CONNECT_CUB_KAFKA_TIMEOUT: 300
       CONNECT_BOOTSTRAP_SERVERS: "kafka1:29092"
@@ -195,20 +195,19 @@ services:
       volumes:
         - ./data/postgres:/var/tmp/postgresql-data
 
-  grafana:
-    image: grafana/grafana:latest
-    container_name: "grafana"
-    links:
-      - influxdb
-    user: "0"
-    ports:
-      - "3000:3000"
-    environment:
-      - GF_DEFAULT_THEME=light
-    volumes:
-      - ./data/grafana:/var/lib/grafana
-
-
+#!#  grafana:
+#!#    image: grafana/grafana:latest
+#!#    container_name: "grafana"
+#!#    links:
+#!#      - influxdb
+#!#    user: "0"
+#!#    ports:
+#!#      - "3000:3000"
+#!#    environment:
+#!#      - GF_DEFAULT_THEME=light
+#!#    volumes:
+#!#      - ./data/grafana:/var/lib/grafana
+#!#
 #!#  jmx-file:
 #!#     image: jmxtrans/jmxtrans:latest
 #!#     depends_on:
@@ -242,6 +241,17 @@ services:
        - SECONDS_BETWEEN_RUNS=3
      volumes:
       - ./config/kafka.json:/var/lib/jmxtrans/jmx.json
+
+  jmx-connect:
+     image: jmxtrans/jmxtrans:latest
+     depends_on:
+       - kafka-connect-01
+       - influxdb
+     container_name: jmx-connect
+     environment:
+       - SECONDS_BETWEEN_RUNS=3
+     volumes:
+      - ./config/connect.json:/var/lib/jmxtrans/jmx.json
 
 
 #!#  jmx-kafka:
@@ -300,6 +310,7 @@ services:
 
   chronograf:
     image: chronograf:latest
+    container_name: chronograf
     volumes:
       # Mount for chronograf database
       - ./data/chronograf/:/var/lib/chronograf/
@@ -308,6 +319,7 @@ services:
       - "8888:8888"
     depends_on:
       - influxdb
+      - kafka3
 
 volumes:
     # This volume is mounted on an image in which the interceptor JARs do exist
