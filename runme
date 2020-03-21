@@ -74,12 +74,13 @@ runSQL
 
 cat <<EOF >/tmp/cmd.sql
 CREATE STREAM GDE_A010_STR WITH (kafka_topic='GDE_000_gdelt_event', value_format='avro',partitions=1);
+CREATE STREAM GDE_C010_STR WITH (kafka_topic='GDE_000_countries', value_format='avro',partitions=1);
 EOF
 runSQL
 
 #Group by 0 is a sneaky hack to avoid "Use of aggregate functions requires a GROUP BY clause. Aggregate function(s): COUNT"
 cat <<EOF >/tmp/cmd.sql
-CREATE TABLE GDE_B020_TAB WITH (kafka_topic='GDE_B020_TAB', value_format='avro',partitions=1) AS SELECT cast(count(*) as bigint) as C_COUNT FROM GDE_A010_STR GROUP BY 0;
+CREATE TABLE GDE_B010_TAB WITH (kafka_topic='GDE_B010_TAB', value_format='avro',partitions=1) AS SELECT cast(count(*) as bigint) as C_COUNT FROM GDE_A010_STR GROUP BY 0;
 EOF
 runSQL
 
@@ -90,10 +91,11 @@ EOF
 runSQL
 
 #set a key on ISO3
-cat <<EOF >/tmp/cmd.sql
-CREATE STREAM GDE_C010_STR WITH (kafka_topic='GDE_C010_STR', value_format='avro',partitions=1) AS SELECT * FROM GDE_000_COUNTRIES PARTITION BY ISO3;
-EOF
-runSQL
+#rekey is not needed! Is this a 5.4 change?
+#cat <<EOF >/tmp/cmd.sql
+#CREATE STREAM GDE_C020_STR WITH (kafka_topic='GDE_C020_STR', value_format='avro',partitions=1) AS SELECT * FROM GDE_C010_STR PARTITION BY ISO3;
+#EOF
+#runSQL
 
 cat <<EOF >/tmp/cmd.sql
 CREATE STREAM GDE_D010_STR WITH (kafka_topic='GDE_D010_STR', value_format='avro',partitions=1) AS SELECT EVENTID as EVENTID, MONTHYEAR , YEAR , FRACTIONDATE , ACTOR1CODE , ACTOR1NAME , ACTOR1COUNTRYCODE , ACTOR1KNOWNGROUPCODE , ACTOR1ETHNICCODE , ACTOR1RELIGION1CODE , ACTOR1RELIGION2CODE , ACTOR1TYPE1CODE , ACTOR1TYPE2CODE , ACTOR1TYPE3CODE , ACTOR2CODE , ACTOR2NAME , ACTOR2COUNTRYCODE , ACTOR2KNOWNGROUPCODE , ACTOR2ETHNICCODE , ACTOR2RELIGION1CODE , ACTOR2RELIGION2CODE , ACTOR2TYPE1CODE , ACTOR2TYPE2CODE , ACTOR2TYPE3CODE , ISROOTEVENT , EVENTCODE , EVENTBASECODE , EVENTROOTCODE , QUADCLASS , GOLDSTEINSCALE , NUMMENTIONS , NUMSOURCES , NUMARTICLES , AVGTONE , ACTOR1GEO_TYPE , ACTOR1GEO_FULLNAME , ACTOR1GEO_COUNTRYCODE , ACTOR1GEO_ADM1CODE , ACTOR1GEO_ADM2CODE , ACTOR1GEO_LAT , ACTOR1GEO_LONG , ACTOR1GEO_FEATUREID , ACTOR2GEO_TYPE , ACTOR2GEO_FULLNAME , ACTOR2GEO_COUNTRYCODE , ACTOR2GEO_ADM1CODE , ACTOR2GEO_ADM2CODE , ACTOR2GEO_LAT , ACTOR2GEO_LONG , ACTOR2GEO_FEATUREID , ACTIONGEO_TYPE , ACTIONGEO_FULLNAME , ACTIONGEO_COUNTRYCODE , ACTIONGEO_ADM1CODE , ACTIONGEO_ADM2CODE , ACTIONGEO_LAT , ACTIONGEO_LONG , ACTIONGEO_FEATUREID , DATEADDED , SOURCEURL, NAME as ACTOR1_COUNTRYNAME FROM GDE_A020_STR JOIN GDE_C010_STR WITHIN 60 MINUTES ON (ACTOR1COUNTRYCODE=ISO3);
@@ -101,17 +103,25 @@ EOF
 runSQL
 
 cat <<EOF >/tmp/cmd.sql
-CREATE TABLE GDE_D020_TAB WITH (kafka_topic='GDE_D020_TAB', value_format='avro',partitions=1) AS SELECT ACTOR1_COUNTRYNAME as CTRY, cast(count(*) as bigint) as C_COUNT , SUM(AVGTONE) / COUNT(*) as C_AVGTONE,max(AVGTONE) as C_MAXTONE, min(AVGTONE) as C_MINTONE,cast(cast(MAX(cast(EVENTID as bigint)) as STRING) as BIGINT) as LAST_EVENTID FROM GDE_D010_STR GROUP BY ACTOR1_COUNTRYNAME;
+CREATE TABLE GDE_D020_TAB WITH (kafka_topic='GDE_D020_TAB', value_format='avro',partitions=1) AS SELECT ACTOR1_COUNTRYNAME , cast(count(*) as bigint) as C_COUNT , SUM(AVGTONE) / COUNT(*) as C_AVGTONE,max(AVGTONE) as C_MAXTONE, min(AVGTONE) as C_MINTONE,cast(cast(MAX(cast(EVENTID as bigint)) as STRING) as BIGINT) as LAST_EVENTID FROM GDE_D010_STR GROUP BY ACTOR1_COUNTRYNAME;
+EOF
+runSQL
+
+#intermediate object - create a stream on the table. Note that this one uses the topic from the prior stmt.
+#note that it specific the schema instead of SELECT*From table (which would return Invalid result type. Your SELECT query produces a TABLE. Please use CREATE TABLE AS SELECT statement instead.
+cat <<EOF >/tmp/cmd.sql
+CREATE STREAM GDE_D030_STR (ACTOR1_COUNTRYNAME string,C_COUNT bigint,C_AVGTONE double,C_MAXTONE double,C_MINTONE double,LAST_EVENTID bigint) WITH (kafka_topic='GDE_D020_TAB', value_format='avro',partitions=1);
 EOF
 runSQL
 
 cat <<EOF >/tmp/cmd.sql
-CREATE STREAM GDE_D030_STR WITH (kafka_topic='GDE_D030_STR', value_format='KAFKA',partitions=1,replicas=3) AS SELECT replace(replace(replace(replace(' {"schema":{"type":"struct","fields":[{"type":"map","keys":{"type":"string","optional":false},"values":{"type":"string","optional":false},"optional":false,"field":"tags"},{"type":"string","optional":false,"field":"time"},{"type":"double","optional":true,"field":"value"},{"type":"double","optional":true,"field":"avgtone"}],"optional":false,"version":1},"payload":{"tags":{"id":"REPLACEME_ID"},"time":"REPLACEME_TS","value":REPLACEME_VALUE,"avgtone":REPLACEME_AVGTONE}}','REPLACEME_ID',ACTOR1_COUNTRYNAME),'REPLACEME_TS',cast(rowtime as STRING)),'REPLACEME_VALUE',cast(C_COUNT as STRING)),'REPLACEME_AVGTONE',cast(C_AVGTONE as STRING)) as influx_json_row FROM GDE_D020_TAB WHERE ACTOR1_COUNTRYNAME>'';
+CREATE STREAM GDE_D040_STR WITH (kafka_topic='GDE_D030_STR', value_format='KAFKA',partitions=1,replicas=3) AS SELECT replace(replace(replace(replace(' {"schema":{"type":"struct","fields":[{"type":"map","keys":{"type":"string","optional":false},"values":{"type":"string","optional":false},"optional":false,"field":"tags"},{"type":"string","optional":false,"field":"time"},{"type":"double","optional":true,"field":"value"},{"type":"double","optional":true,"field":"avgtone"}],"optional":false,"version":1},"payload":{"tags":{"id":"REPLACEME_ID"},"time":"REPLACEME_TS","value":REPLACEME_VALUE,"avgtone":REPLACEME_AVGTONE}}','REPLACEME_ID',ACTOR1_COUNTRYNAME),'REPLACEME_TS',cast(rowtime as STRING)),'REPLACEME_VALUE',cast(C_COUNT as STRING)),'REPLACEME_AVGTONE',cast(C_AVGTONE as STRING)) as influx_json_row FROM GDE_D030_STR WHERE ACTOR1_COUNTRYNAME>'';
 EOF
 runSQL
 
 cat <<EOF >/tmp/cmd.sql
-CREATE SINK CONNECTOR sinkinflux_gde_${DT2} WITH ( 'connector.class'='io.confluent.influxdb.InfluxDBSinkConnector','tasks.max'='1','topics'='GDE_D030_STR','influxdb.url'='http://influxdb:8086', 'influxdb.db'='gdelt','influx.db.username'='root','influxdb.password'='root','measurement.name.format'='GDE_D030_STR','value.converter'='org.apache.kafka.connect.json.JsonConverter');
+CREATE SINK CONNECTOR sink_inf_D040 WITH ( 'connector.class'='io.confluent.influxdb.InfluxDBSinkConnector','tasks.max'='1','topics'='GDE_D040_STR','influxdb.url'='http://influxdb:8086', 'influxdb.db'='gdelt','influx.db.username'='root','influxdb.password'='root','measurement.name.format'='GDE_D040_STR','value.converter'='org.apache.kafka.connect.json.JsonConverter');
+CREATE SINK CONNECTOR sink_inf_B010 WITH ( 'connector.class'='io.confluent.influxdb.InfluxDBSinkConnector','tasks.max'='1','topics'='GDE_B010_TAB','influxdb.url'='http://influxdb:8086', 'influxdb.db'='gdelt','influx.db.username'='root','influxdb.password'='root','measurement.name.format'='GDE_B010_TAB','value.converter'='org.apache.kafka.connect.json.JsonConverter');
 runSQL
 
 clear
