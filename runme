@@ -27,15 +27,15 @@ runSQL()
 Pause()
 {
   echo;echo "Paused"
-  read Pause
-  #sleep 30
+  #read Pause
+  sleep 30
   clear
   echo;echo
 }
 
 
 
-#sleep 180
+sleep 180
 clear
 echo "Check status - is everything up?"
 docker-compose up --detach
@@ -61,9 +61,11 @@ docker-compose -f docker-compose.yml exec postgres bash -c "psql -U postgres pos
 docker-compose -f docker-compose.yml exec postgres bash -c "psql -U postgres postgres -c \"SELECT count(*) from GDELT_EVENT;\" "
 Pause
 
+kafka-topics --bootstrap-server kafka1:9092 --topic GDE_000_gdelt_event --create --replication-factor 1
+kafka-topics --bootstrap-server kafka1:9092 --topic GDE_000_countries   --create --replication-factor 1
 cat <<EOF >/tmp/cmd.sql
 CREATE SOURCE CONNECTOR source_jdbc_gdelt_event WITH ( 'connector.class'='io.confluent.connect.jdbc.JdbcSourceConnector', 'connection.url'='jdbc:postgresql://postgres:5432/postgres?user=postgres&password=postgres', 'mode'='incrementing','incrementing.column.name'='eventid', 'topic.prefix'='GDE_000_','table.whitelist'='gdelt_event','numeric.mapping'='best_fit','schema.pattern'='public');
-CREATE SOURCE CONNECTOR source_jdbc_countries WITH ( 'connector.class'='io.confluent.connect.jdbc.JdbcSourceConnector', 'connection.url'='jdbc:postgresql://postgres:5432/postgres?user=postgres&password=postgres', 'mode'='incrementing','incrementing.column.name'='id', 'topic.prefix'='GDE_000_','table.whitelist'='countries','numeric.mapping'='best_fit','schema.pattern'='public');
+CREATE SOURCE CONNECTOR source_jdbc_countries WITH ( 'connector.class'='io.confluent.connect.jdbc.JdbcSourceConnector', 'connection.url'='jdbc:postgresql://postgres:5432/postgres?user=postgres&password=postgres', 'mode'='incrementing','incrementing.column.name'='id', 'topic.prefix'='GDE_000_','table.whitelist'='countries','numeric.mapping'='best_fit','schema.pattern'='public','topic.creation.default.replication.factor'='1');
 EOF
 runSQL
 
@@ -73,55 +75,56 @@ EOF
 runSQL
 
 cat <<EOF >/tmp/cmd.sql
-CREATE STREAM GDE_A010_STR WITH (kafka_topic='GDE_000_gdelt_event', value_format='avro',partitions=1);
-CREATE STREAM GDE_C010_STR WITH (kafka_topic='GDE_000_countries', value_format='avro',partitions=1);
+CREATE STREAM GDE_A010_STR WITH (kafka_topic='GDE_000_gdelt_event', value_format='avro',partitions=1,replicas=1);
+CREATE STREAM GDE_C010_STR WITH (kafka_topic='GDE_000_countries', value_format='avro',partitions=1,replicas=1);
 EOF
 runSQL
 
-#Group by 0 is a sneaky hack to avoid "Use of aggregate functions requires a GROUP BY clause. Aggregate function(s): COUNT"
-cat <<EOF >/tmp/cmd.sql
-CREATE TABLE GDE_B010_TAB WITH (kafka_topic='GDE_B010_TAB', value_format='avro',partitions=1) AS SELECT cast(count(*) as bigint) as C_COUNT FROM GDE_A010_STR GROUP BY 0;
-EOF
-runSQL
 
 #set a key on ACTOR1COUNTRYCODE
 cat <<EOF >/tmp/cmd.sql
-CREATE STREAM GDE_A020_STR WITH (kafka_topic='GDE_A020_STR', value_format='avro',partitions=1) AS SELECT * FROM GDE_A010_STR PARTITION BY ACTOR1COUNTRYCODE;
+CREATE STREAM GDE_A020_STR WITH (kafka_topic='GDE_A020_STR', value_format='avro',partitions=1,replicas=1) AS SELECT * FROM GDE_A010_STR PARTITION BY ACTOR1COUNTRYCODE;
 EOF
 runSQL
 
-#set a key on ISO3
-#rekey is not needed! Is this a 5.4 change?
-#cat <<EOF >/tmp/cmd.sql
-#CREATE STREAM GDE_C020_STR WITH (kafka_topic='GDE_C020_STR', value_format='avro',partitions=1) AS SELECT * FROM GDE_C010_STR PARTITION BY ISO3;
-#EOF
-#runSQL
+#group by 0 is a sneaky little hack
+cat <<EOF >/tmp/cmd.sql
+CREATE TABLE GDE_B010_TAB WITH (kafka_topic='GDE_B010_TAB',value_format='KAFKA',partitions=1,replicas=1) AS SELECT replace(replace(replace(' {"schema":{"type":"struct","fields":[{"type":"map","keys":{"type":"string","optional":false},"values":{"type":"string","optional":false},"optional":false,"field":"tags"},{"type":"string","optional":false,"field":"time"},{"type":"double","optional":true,"field":"value"}],"optional":false,"version":1},"payload":{"tags":{"id":"REPLACEME_ID"},"time":"REPLACEME_TS","value":REPLACEME_VALUE}}' ,'REPLACEME_ID'   ,'GDE_B010_ROWCOUNT'     ) ,'REPLACEME_TS'   ,cast(max(rowtime) as STRING) ) ,'REPLACEME_VALUE',cast(count(*) as STRING)) as influx_json_row FROM GDE_A020_STR GROUP BY 0;
+EOF
+runSQL
+
 
 cat <<EOF >/tmp/cmd.sql
-CREATE STREAM GDE_D010_STR WITH (kafka_topic='GDE_D010_STR', value_format='avro',partitions=1) AS SELECT EVENTID as EVENTID, MONTHYEAR , YEAR , FRACTIONDATE , ACTOR1CODE , ACTOR1NAME , ACTOR1COUNTRYCODE , ACTOR1KNOWNGROUPCODE , ACTOR1ETHNICCODE , ACTOR1RELIGION1CODE , ACTOR1RELIGION2CODE , ACTOR1TYPE1CODE , ACTOR1TYPE2CODE , ACTOR1TYPE3CODE , ACTOR2CODE , ACTOR2NAME , ACTOR2COUNTRYCODE , ACTOR2KNOWNGROUPCODE , ACTOR2ETHNICCODE , ACTOR2RELIGION1CODE , ACTOR2RELIGION2CODE , ACTOR2TYPE1CODE , ACTOR2TYPE2CODE , ACTOR2TYPE3CODE , ISROOTEVENT , EVENTCODE , EVENTBASECODE , EVENTROOTCODE , QUADCLASS , GOLDSTEINSCALE , NUMMENTIONS , NUMSOURCES , NUMARTICLES , AVGTONE , ACTOR1GEO_TYPE , ACTOR1GEO_FULLNAME , ACTOR1GEO_COUNTRYCODE , ACTOR1GEO_ADM1CODE , ACTOR1GEO_ADM2CODE , ACTOR1GEO_LAT , ACTOR1GEO_LONG , ACTOR1GEO_FEATUREID , ACTOR2GEO_TYPE , ACTOR2GEO_FULLNAME , ACTOR2GEO_COUNTRYCODE , ACTOR2GEO_ADM1CODE , ACTOR2GEO_ADM2CODE , ACTOR2GEO_LAT , ACTOR2GEO_LONG , ACTOR2GEO_FEATUREID , ACTIONGEO_TYPE , ACTIONGEO_FULLNAME , ACTIONGEO_COUNTRYCODE , ACTIONGEO_ADM1CODE , ACTIONGEO_ADM2CODE , ACTIONGEO_LAT , ACTIONGEO_LONG , ACTIONGEO_FEATUREID , DATEADDED , SOURCEURL, NAME as ACTOR1_COUNTRYNAME FROM GDE_A020_STR JOIN GDE_C010_STR WITHIN 60 MINUTES ON (ACTOR1COUNTRYCODE=ISO3);
+CREATE STREAM GDE_D010_STR WITH (kafka_topic='GDE_D010_STR', value_format='avro',partitions=1,replicas=1) AS SELECT EVENTID as EVENTID, MONTHYEAR , YEAR , FRACTIONDATE , ACTOR1CODE , ACTOR1NAME , ACTOR1COUNTRYCODE , ACTOR1KNOWNGROUPCODE , ACTOR1ETHNICCODE , ACTOR1RELIGION1CODE , ACTOR1RELIGION2CODE , ACTOR1TYPE1CODE , ACTOR1TYPE2CODE , ACTOR1TYPE3CODE , ACTOR2CODE , ACTOR2NAME , ACTOR2COUNTRYCODE , ACTOR2KNOWNGROUPCODE , ACTOR2ETHNICCODE , ACTOR2RELIGION1CODE , ACTOR2RELIGION2CODE , ACTOR2TYPE1CODE , ACTOR2TYPE2CODE , ACTOR2TYPE3CODE , ISROOTEVENT , EVENTCODE , EVENTBASECODE , EVENTROOTCODE , QUADCLASS , GOLDSTEINSCALE , NUMMENTIONS , NUMSOURCES , NUMARTICLES , AVGTONE , ACTOR1GEO_TYPE , ACTOR1GEO_FULLNAME , ACTOR1GEO_COUNTRYCODE , ACTOR1GEO_ADM1CODE , ACTOR1GEO_ADM2CODE , ACTOR1GEO_LAT , ACTOR1GEO_LONG , ACTOR1GEO_FEATUREID , ACTOR2GEO_TYPE , ACTOR2GEO_FULLNAME , ACTOR2GEO_COUNTRYCODE , ACTOR2GEO_ADM1CODE , ACTOR2GEO_ADM2CODE , ACTOR2GEO_LAT , ACTOR2GEO_LONG , ACTOR2GEO_FEATUREID , ACTIONGEO_TYPE , ACTIONGEO_FULLNAME , ACTIONGEO_COUNTRYCODE , ACTIONGEO_ADM1CODE , ACTIONGEO_ADM2CODE , ACTIONGEO_LAT , ACTIONGEO_LONG , ACTIONGEO_FEATUREID , DATEADDED , SOURCEURL, NAME as ACTOR1_COUNTRYNAME FROM GDE_A020_STR JOIN GDE_C010_STR WITHIN 60 MINUTES ON (ACTOR1COUNTRYCODE=ISO3);
 EOF
 runSQL
 
 cat <<EOF >/tmp/cmd.sql
-CREATE TABLE GDE_D020_TAB WITH (kafka_topic='GDE_D020_TAB', value_format='avro',partitions=1) AS SELECT ACTOR1_COUNTRYNAME , cast(count(*) as bigint) as C_COUNT , SUM(AVGTONE) / COUNT(*) as C_AVGTONE,max(AVGTONE) as C_MAXTONE, min(AVGTONE) as C_MINTONE,cast(cast(MAX(cast(EVENTID as bigint)) as STRING) as BIGINT) as LAST_EVENTID FROM GDE_D010_STR GROUP BY ACTOR1_COUNTRYNAME;
+CREATE TABLE GDE_D020_TAB WITH (kafka_topic='GDE_D020_TAB', value_format='avro',partitions=1,replicas=1) AS SELECT ACTOR1_COUNTRYNAME , cast(count(*) as bigint) as C_COUNT , SUM(AVGTONE) / COUNT(*) as C_AVGTONE,max(AVGTONE) as C_MAXTONE, min(AVGTONE) as C_MINTONE,cast(cast(MAX(cast(EVENTID as bigint)) as STRING) as BIGINT) as LAST_EVENTID FROM GDE_D010_STR GROUP BY ACTOR1_COUNTRYNAME;
 EOF
 runSQL
 
 #intermediate object - create a stream on the table. Note that this one uses the topic from the prior stmt.
 #note that it specific the schema instead of SELECT*From table (which would return Invalid result type. Your SELECT query produces a TABLE. Please use CREATE TABLE AS SELECT statement instead.
 cat <<EOF >/tmp/cmd.sql
-CREATE STREAM GDE_D030_STR (ACTOR1_COUNTRYNAME string,C_COUNT bigint,C_AVGTONE double,C_MAXTONE double,C_MINTONE double,LAST_EVENTID bigint) WITH (kafka_topic='GDE_D020_TAB', value_format='avro',partitions=1);
+CREATE STREAM GDE_D030_STR (ACTOR1_COUNTRYNAME string,C_COUNT bigint,C_AVGTONE double,C_MAXTONE double,C_MINTONE double,LAST_EVENTID bigint) WITH (kafka_topic='GDE_D020_TAB', value_format='avro',partitions=1,replicas=1);
 EOF
 runSQL
 
+
+#create an InfluxDB Sink Stream of topic data to display country totals 
+
 cat <<EOF >/tmp/cmd.sql
-CREATE STREAM GDE_D040_STR WITH (kafka_topic='GDE_D030_STR', value_format='KAFKA',partitions=1,replicas=3) AS SELECT replace(replace(replace(replace(' {"schema":{"type":"struct","fields":[{"type":"map","keys":{"type":"string","optional":false},"values":{"type":"string","optional":false},"optional":false,"field":"tags"},{"type":"string","optional":false,"field":"time"},{"type":"double","optional":true,"field":"value"},{"type":"double","optional":true,"field":"avgtone"}],"optional":false,"version":1},"payload":{"tags":{"id":"REPLACEME_ID"},"time":"REPLACEME_TS","value":REPLACEME_VALUE,"avgtone":REPLACEME_AVGTONE}}','REPLACEME_ID',ACTOR1_COUNTRYNAME),'REPLACEME_TS',cast(rowtime as STRING)),'REPLACEME_VALUE',cast(C_COUNT as STRING)),'REPLACEME_AVGTONE',cast(C_AVGTONE as STRING)) as influx_json_row FROM GDE_D030_STR WHERE ACTOR1_COUNTRYNAME>'';
+CREATE STREAM GDE_D040_STR WITH (kafka_topic='GDE_D040_STR', value_format='KAFKA',partitions=1,replicas=1) AS SELECT replace(replace(replace(replace(' {"schema":{"type":"struct","fields":[{"type":"map","keys":{"type":"string","optional":false},"values":{"type":"string","optional":false},"optional":false,"field":"tags"},{"type":"string","optional":false,"field":"time"},{"type":"double","optional":true,"field":"value"},{"type":"double","optional":true,"field":"avgtone"}],"optional":false,"version":1},"payload":{"tags":{"id":"REPLACEME_ID"},"time":"REPLACEME_TS","value":REPLACEME_VALUE,"avgtone":REPLACEME_AVGTONE}}','REPLACEME_ID',ACTOR1_COUNTRYNAME),'REPLACEME_TS',cast(rowtime as STRING)),'REPLACEME_VALUE',cast(C_COUNT as STRING)),'REPLACEME_AVGTONE',cast(C_AVGTONE as STRING)) as influx_json_row FROM GDE_D030_STR WHERE ACTOR1_COUNTRYNAME>'';
+
 EOF
 runSQL
 
 cat <<EOF >/tmp/cmd.sql
 CREATE SINK CONNECTOR sink_inf_D040 WITH ( 'connector.class'='io.confluent.influxdb.InfluxDBSinkConnector','tasks.max'='1','topics'='GDE_D040_STR','influxdb.url'='http://influxdb:8086', 'influxdb.db'='gdelt','influx.db.username'='root','influxdb.password'='root','measurement.name.format'='GDE_D040_STR','value.converter'='org.apache.kafka.connect.json.JsonConverter');
+
 CREATE SINK CONNECTOR sink_inf_B010 WITH ( 'connector.class'='io.confluent.influxdb.InfluxDBSinkConnector','tasks.max'='1','topics'='GDE_B010_TAB','influxdb.url'='http://influxdb:8086', 'influxdb.db'='gdelt','influx.db.username'='root','influxdb.password'='root','measurement.name.format'='GDE_B010_TAB','value.converter'='org.apache.kafka.connect.json.JsonConverter');
+EOF
 runSQL
 
 clear
@@ -133,115 +136,5 @@ docker-compose -f docker-compose.yml exec postgres bash -c "psql -U postgres pos
 
 
 echo;echo;echo "Finished!"
-
-
-exit
-
-
-
-
-
-
-
-
-
-
-#this cmd has single- and double- quotes so cp it to the container to run it; avoiding shell escaping insanity and hell
-cat /tmp/cmd.sql
-
-CMD=`cat /tmp/cmd.sql`
-docker exec -it ksqldb-cli bash -c "echo \"${CMD}\" |  ksql http://ksqldb-gde:8088"
-Pause
-sleep 5
-SEQ=020
-THR=B
-TYP=TAB
-OBJ=${APP}_${SEQ}_${THR}_${TYP}_${REL}
-cat <<EOF >/tmp/cmd.sql
-CREATE TABLE $OBJ AS SELECT ACTOR1COUNTRYCODE as CTRY, cast(count(*) as bigint) as C_COUNT , SUM(AVGTONE) / COUNT(*) as C_AVGTONE,max(AVGTONE) as C_MAXTONE, min(AVGTONE) as C_MINTONE,cast(cast(MAX(cast(EVENTID as bigint)) as STRING) as BIGINT) as LAST_EVENTID FROM GDE_010_A_STR_V01 GROUP BY ACTOR1COUNTRYCODE;
-EOF
-CMD=`cat /tmp/cmd.sql`
-docker exec -it ksqldb-cli bash -c "echo \"${CMD}\" |  ksql http://ksqldb-gde:8088"
-
-
-
-
-
-
-
-
-Pause
-SEQ=030
-TYP=RKY
-THR=C
-OBJ=${APP}_${SEQ}_${THR}_${TYP}_${REL}
-cat <<EOF >/tmp/cmd.sql
-set 'auto.offset.reset'='earliest';
-CREATE STREAM $OBJ WITH (KAFKA_TOPIC='GDE_020_B_TAB_V01', VALUE_FORMAT='AVRO');
-EOF
-CMD=`cat /tmp/cmd.sql`
-docker exec -it ksqldb-cli bash -c "echo \"${CMD}\" |  ksql http://ksqldb-gde:8088"
-Pause
-
-
-SEQ=040
-TYP=RKY
-OBJ=${APP}_${SEQ}_${THR}_${TYP}_${REL}
-cat <<EOF >/tmp/cmd.sql
-set 'auto.offset.reset'='earliest';
-CREATE STREAM $OBJ AS SELECT CTRY,C_COUNT,C_AVGTONE,C_MAXTONE,C_MINTONE,LAST_EVENTID FROM GDE_030_C_RKY_V01;
-EOF
-CMD=`cat /tmp/cmd.sql`
-docker exec -it ksqldb-cli bash -c "echo \"${CMD}\" |  ksql http://ksqldb-gde:8088"
-
-Pause
-SEQ=050
-TYP=RKY
-OBJ=${APP}_${SEQ}_${THR}_${TYP}_${REL}
-cat <<EOF >/tmp/cmd.sql
-set 'auto.offset.reset'='earliest';
-CREATE STREAM $OBJ AS SELECT * FROM GDE_040_C_RKY_V01 PARTITION BY LAST_EVENTID;
-EOF
-CMD=`cat /tmp/cmd.sql`
-docker exec -it ksqldb-cli bash -c "echo \"${CMD}\" |  ksql http://ksqldb-gde:8088"
-Pause
-THR=D
-SEQ=060
-TYP=STR
-OBJ=${APP}_${SEQ}_${THR}_${TYP}_${REL}
-cat <<EOF >/tmp/cmd.sql
-set 'auto.offset.reset'='earliest';
-CREATE STREAM $OBJ  AS SELECT EVENTID as EVENTID, MONTHYEAR , YEAR , FRACTIONDATE , ACTOR1CODE , ACTOR1NAME , ACTOR1COUNTRYCODE , ACTOR1KNOWNGROUPCODE , ACTOR1ETHNICCODE , ACTOR1RELIGION1CODE , ACTOR1RELIGION2CODE , ACTOR1TYPE1CODE , ACTOR1TYPE2CODE , ACTOR1TYPE3CODE , ACTOR2CODE , ACTOR2NAME , ACTOR2COUNTRYCODE , ACTOR2KNOWNGROUPCODE , ACTOR2ETHNICCODE , ACTOR2RELIGION1CODE , ACTOR2RELIGION2CODE , ACTOR2TYPE1CODE , ACTOR2TYPE2CODE , ACTOR2TYPE3CODE , ISROOTEVENT , EVENTCODE , EVENTBASECODE , EVENTROOTCODE , QUADCLASS , GOLDSTEINSCALE , NUMMENTIONS , NUMSOURCES , NUMARTICLES , AVGTONE , ACTOR1GEO_TYPE , ACTOR1GEO_FULLNAME , ACTOR1GEO_COUNTRYCODE , ACTOR1GEO_ADM1CODE , ACTOR1GEO_ADM2CODE , ACTOR1GEO_LAT , ACTOR1GEO_LONG , ACTOR1GEO_FEATUREID , ACTOR2GEO_TYPE , ACTOR2GEO_FULLNAME , ACTOR2GEO_COUNTRYCODE , ACTOR2GEO_ADM1CODE , ACTOR2GEO_ADM2CODE , ACTOR2GEO_LAT , ACTOR2GEO_LONG , ACTOR2GEO_FEATUREID , ACTIONGEO_TYPE , ACTIONGEO_FULLNAME , ACTIONGEO_COUNTRYCODE , ACTIONGEO_ADM1CODE , ACTIONGEO_ADM2CODE , ACTIONGEO_LAT , ACTIONGEO_LONG , ACTIONGEO_FEATUREID , DATEADDED , SOURCEURL, C_MINTONE,C_AVGTONE,C_MAXTONE,cast(C_COUNT as INT) as C_COUNT FROM GDE_010_A_STR_V01 JOIN GDE_050_C_RKY_V01 WITHIN 60 MINUTES ON (EVENTID=LAST_EVENTID);
-EOF
-CMD=`cat /tmp/cmd.sql`
-docker exec -it ksqldb-cli bash -c "echo \"${CMD}\" |  ksql http://ksqldb-gde:8088"
-Pause
-
-THR=D
-SEQ=070
-TYP=STR
-OBJ=${APP}_${SEQ}_${THR}_${TYP}_${REL}
-cat <<EOF >/tmp/cmd.sql
-set 'auto.offset.reset'='earliest';
-CREATE STREAM $OBJ WITH (kafka_topic='$OBJ', value_format='KAFKA',partitions=1,replicas=3) AS SELECT replace(replace(replace(replace('
-{"schema":{"type":"struct","fields":[{"type":"map","keys":{"type":"string","optional":false},"values":{"type":"string","optional":false},"optional":false,"field":"tags"},{"type":"string","optional":false,"field":"time"},{"type":"double","optional":true,"field":"value"},{"type":"double","optional":true,"field":"avgtone"}],"optional":false,"version":1},"payload":{"tags":{"id":"REPLACEME_ID"},"time":"REPLACEME_TS","value":REPLACEME_VALUE,"avgtone":REPLACEME_AVGTONE}}','REPLACEME_ID',ACTOR1COUNTRYCODE),'REPLACEME_TS',cast(rowtime as STRING)),'REPLACEME_VALUE',cast(C_COUNT as STRING)),'REPLACEME_AVGTONE',cast(C_AVGTONE as STRING)) as influx_json_row FROM GDE_060_D_STR_V01 WHERE ACTOR1COUNTRYCODE>'';
-EOF
-#this cmd has single- and double- quotes so cp it to the container to run it; avoiding shell escaping insanity and hell
-cat /tmp/cmd.sql
-Pause
-docker cp /tmp/cmd.sql ksqldb-cli:/tmp/cmd.sql
-docker exec -it ksqldb-cli bash -c "ksql http://ksqldb-gde:8088 < /tmp/cmd.sql"
-Pause
-
-
-cat <<EOF >/tmp/cmd.sql
-CREATE SINK CONNECTOR sinkinflux_gde_${DT2} WITH ( 'connector.class'='io.confluent.influxdb.InfluxDBSinkConnector','tasks.max'='1','topics'='GDE_070_D_STR_V01','influxdb.url'='http://influxdb:8086', 'influxdb.db'='gdelt','influx.db.username'='root','influxdb.password'='root','measurement.name.format'='GDE_070_D_STR_V01','value.converter'='org.apache.kafka.connect.json.JsonConverter');
-EOF
-CMD=`cat /tmp/cmd.sql`
-docker exec -it ksqldb-cli bash -c "echo \"${CMD}\" |  ksql http://ksqldb-gde:8088"
-
-Pause
-
-
 
 

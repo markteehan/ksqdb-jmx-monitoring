@@ -5,60 +5,49 @@
 			"1": {
 				"name": "Influx 1",
 				"link": "/chronograf/v1/sources/1"
-			},
-			"2": {
-				"name": "Influx 1",
-				"link": "/chronograf/v1/sources/2"
 			}
 		}
 	},
 	"dashboard": {
-		"id": "2",
+		"id": "3",
 		"cells": [
 			{
-				"i": "8ce26399-6dbc-42a0-a859-afe744958228",
-				"x": 9,
-				"y": 5,
+				"i": "3ebc1c3a-4528-49c3-adb2-a16a29e836ef",
+				"x": 8,
+				"y": 2,
 				"w": 1,
 				"h": 1,
-				"name": "IND",
+				"name": "jmx-Kafka",
 				"queries": [
 					{
-						"query": "SELECT sum(\"value\") AS \"v_value\" FROM \"gdelt\".\"autogen\".\"GDE_D040_STR\" WHERE time < :upperDashboardTime: AND \"id\"='IND' GROUP BY time(:interval:) FILL(null)",
+						"query": "SELECT count(*) AS \"jmx-kafka\" FROM \"db-kafka\".\"autogen\".\"ActiveControllerCount\" WHERE time > :dashboardTime: AND time < :upperDashboardTime: GROUP BY time(:interval:) FILL(null)",
 						"queryConfig": {
-							"database": "gdelt",
-							"measurement": "GDE_D040_STR",
+							"database": "db-kafka",
+							"measurement": "ActiveControllerCount",
 							"retentionPolicy": "autogen",
 							"fields": [
 								{
-									"value": "sum",
+									"value": "count",
 									"type": "func",
-									"alias": "v_value",
+									"alias": "jmx-kafka",
 									"args": [
 										{
-											"value": "value",
-											"type": "field",
+											"value": "*",
+											"type": "wildcard",
 											"alias": ""
 										}
 									]
 								}
 							],
-							"tags": {
-								"id": [
-									"IND"
-								]
-							},
+							"tags": {},
 							"groupBy": {
 								"time": "auto",
 								"tags": []
 							},
-							"areTagsAccepted": true,
+							"areTagsAccepted": false,
 							"fill": "null",
 							"rawText": null,
-							"range": {
-								"upper": "",
-								"lower": "now() - 1m"
-							},
+							"range": null,
 							"shifts": null
 						},
 						"source": "",
@@ -105,9 +94,16 @@
 					{
 						"id": "base",
 						"type": "text",
+						"hex": "#7CE490",
+						"name": "honeydew",
+						"value": "-1000000000000000000"
+					},
+					{
+						"id": "1b53e85c-c35f-4370-8e8d-6b0cf89a0b8e",
+						"type": "text",
 						"hex": "#00C9FF",
 						"name": "laser",
-						"value": "-1000000000000000000"
+						"value": "0"
 					}
 				],
 				"legend": {},
@@ -126,10 +122,129 @@
 						"internalName": "time",
 						"displayName": "",
 						"visible": true
+					}
+				],
+				"timeFormat": "MM/DD/YYYY HH:mm:ss",
+				"decimalPlaces": {
+					"isEnforced": true,
+					"digits": 0
+				},
+				"note": "",
+				"noteVisibility": "default",
+				"links": {
+					"self": "/chronograf/v1/dashboards/3/cells/3ebc1c3a-4528-49c3-adb2-a16a29e836ef"
+				}
+			},
+			{
+				"i": "7a67286b-e2e0-4c9c-926a-8fecf7dede81",
+				"x": 8,
+				"y": 0,
+				"w": 1,
+				"h": 1,
+				"name": "jmx-GDE",
+				"queries": [
+					{
+						"query": "SELECT count(*) AS \"jmx-GDE\" FROM \"gde-db\".\"autogen\".\"GDE_Metrics\" WHERE time > :dashboardTime: AND time < :upperDashboardTime: GROUP BY time(:interval:) FILL(null)",
+						"queryConfig": {
+							"database": "gde-db",
+							"measurement": "GDE_Metrics",
+							"retentionPolicy": "autogen",
+							"fields": [
+								{
+									"value": "count",
+									"type": "func",
+									"alias": "jmx-GDE",
+									"args": [
+										{
+											"value": "*",
+											"type": "wildcard",
+											"alias": ""
+										}
+									]
+								}
+							],
+							"tags": {},
+							"groupBy": {
+								"time": "auto",
+								"tags": []
+							},
+							"areTagsAccepted": false,
+							"fill": "null",
+							"rawText": null,
+							"range": null,
+							"shifts": null
+						},
+						"source": "",
+						"type": "influxql"
+					}
+				],
+				"axes": {
+					"x": {
+						"bounds": [
+							"",
+							""
+						],
+						"label": "",
+						"prefix": "",
+						"suffix": "",
+						"base": "10",
+						"scale": "linear"
+					},
+					"y": {
+						"bounds": [
+							"",
+							""
+						],
+						"label": "",
+						"prefix": "",
+						"suffix": "",
+						"base": "10",
+						"scale": "linear"
+					},
+					"y2": {
+						"bounds": [
+							"",
+							""
+						],
+						"label": "",
+						"prefix": "",
+						"suffix": "",
+						"base": "10",
+						"scale": "linear"
+					}
+				},
+				"type": "single-stat",
+				"colors": [
+					{
+						"id": "base",
+						"type": "text",
+						"hex": "#F95F53",
+						"name": "curacao",
+						"value": "-1000000000000000000"
 					},
 					{
-						"internalName": "GDE_D040_STR.v_value",
-						"displayName": "USA",
+						"id": "1b53e85c-c35f-4370-8e8d-6b0cf89a0b8e",
+						"type": "text",
+						"hex": "#00C9FF",
+						"name": "laser",
+						"value": "0"
+					}
+				],
+				"legend": {},
+				"tableOptions": {
+					"verticalTimeAxis": true,
+					"sortBy": {
+						"internalName": "time",
+						"displayName": "",
+						"visible": true
+					},
+					"wrapping": "truncate",
+					"fixFirstColumn": true
+				},
+				"fieldOptions": [
+					{
+						"internalName": "time",
+						"displayName": "",
 						"visible": true
 					}
 				],
@@ -138,14 +253,262 @@
 					"isEnforced": true,
 					"digits": 0
 				},
-				"note": "USA\t",
+				"note": "",
 				"noteVisibility": "default",
 				"links": {
-					"self": "/chronograf/v1/dashboards/2/cells/8ce26399-6dbc-42a0-a859-afe744958228"
+					"self": "/chronograf/v1/dashboards/3/cells/7a67286b-e2e0-4c9c-926a-8fecf7dede81"
 				}
 			},
 			{
-				"i": "87764ff4-f4b9-47fd-a4c5-def723d58a31",
+				"i": "dba8f22d-4079-4ad5-8f52-3c301c9a0f09",
+				"x": 9,
+				"y": 0,
+				"w": 1,
+				"h": 1,
+				"name": "data-GDE",
+				"queries": [
+					{
+						"query": "SELECT count(\"*\") AS \"rowcount\" FROM \"gdelt\".\"autogen\".\"GDE_D040_STR\" WHERE time > :dashboardTime: AND time < :upperDashboardTime: GROUP BY time(:interval:) FILL(null)",
+						"queryConfig": {
+							"database": "gdelt",
+							"measurement": "GDE_D040_STR",
+							"retentionPolicy": "autogen",
+							"fields": [
+								{
+									"value": "count",
+									"type": "func",
+									"alias": "rowcount",
+									"args": [
+										{
+											"value": "*",
+											"type": "field",
+											"alias": ""
+										}
+									]
+								}
+							],
+							"tags": {},
+							"groupBy": {
+								"time": "auto",
+								"tags": []
+							},
+							"areTagsAccepted": false,
+							"fill": "null",
+							"rawText": null,
+							"range": null,
+							"shifts": null
+						},
+						"source": "",
+						"type": "influxql"
+					}
+				],
+				"axes": {
+					"x": {
+						"bounds": [
+							"",
+							""
+						],
+						"label": "",
+						"prefix": "",
+						"suffix": "",
+						"base": "10",
+						"scale": "linear"
+					},
+					"y": {
+						"bounds": [
+							"",
+							""
+						],
+						"label": "",
+						"prefix": "",
+						"suffix": "",
+						"base": "10",
+						"scale": "linear"
+					},
+					"y2": {
+						"bounds": [
+							"",
+							""
+						],
+						"label": "",
+						"prefix": "",
+						"suffix": "",
+						"base": "10",
+						"scale": "linear"
+					}
+				},
+				"type": "single-stat",
+				"colors": [
+					{
+						"id": "base",
+						"type": "text",
+						"hex": "#7CE490",
+						"name": "honeydew",
+						"value": "-1000000000000000000"
+					},
+					{
+						"id": "1b53e85c-c35f-4370-8e8d-6b0cf89a0b8e",
+						"type": "text",
+						"hex": "#00C9FF",
+						"name": "laser",
+						"value": "0"
+					}
+				],
+				"legend": {},
+				"tableOptions": {
+					"verticalTimeAxis": true,
+					"sortBy": {
+						"internalName": "time",
+						"displayName": "",
+						"visible": true
+					},
+					"wrapping": "truncate",
+					"fixFirstColumn": true
+				},
+				"fieldOptions": [
+					{
+						"internalName": "time",
+						"displayName": "",
+						"visible": true
+					}
+				],
+				"timeFormat": "MM/DD/YYYY HH:mm:ss",
+				"decimalPlaces": {
+					"isEnforced": true,
+					"digits": 0
+				},
+				"note": "",
+				"noteVisibility": "default",
+				"links": {
+					"self": "/chronograf/v1/dashboards/3/cells/dba8f22d-4079-4ad5-8f52-3c301c9a0f09"
+				}
+			},
+			{
+				"i": "eb47392a-bd91-4acb-ba3e-7dbf0bf8069f",
+				"x": 8,
+				"y": 1,
+				"w": 1,
+				"h": 1,
+				"name": "jmx-Connect",
+				"queries": [
+					{
+						"query": "SELECT count(*) AS \"jmx-Connect\" FROM \"db-connect\".\"autogen\".\"connect-source\" WHERE time > :dashboardTime: AND time < :upperDashboardTime: GROUP BY time(:interval:) FILL(null)",
+						"queryConfig": {
+							"database": "db-connect",
+							"measurement": "connect-source",
+							"retentionPolicy": "autogen",
+							"fields": [
+								{
+									"value": "count",
+									"type": "func",
+									"alias": "jmx-Connect",
+									"args": [
+										{
+											"value": "*",
+											"type": "wildcard",
+											"alias": ""
+										}
+									]
+								}
+							],
+							"tags": {},
+							"groupBy": {
+								"time": "auto",
+								"tags": []
+							},
+							"areTagsAccepted": false,
+							"fill": "null",
+							"rawText": null,
+							"range": null,
+							"shifts": null
+						},
+						"source": "",
+						"type": "influxql"
+					}
+				],
+				"axes": {
+					"x": {
+						"bounds": [
+							"",
+							""
+						],
+						"label": "",
+						"prefix": "",
+						"suffix": "",
+						"base": "10",
+						"scale": "linear"
+					},
+					"y": {
+						"bounds": [
+							"",
+							""
+						],
+						"label": "",
+						"prefix": "",
+						"suffix": "",
+						"base": "10",
+						"scale": "linear"
+					},
+					"y2": {
+						"bounds": [
+							"",
+							""
+						],
+						"label": "",
+						"prefix": "",
+						"suffix": "",
+						"base": "10",
+						"scale": "linear"
+					}
+				},
+				"type": "single-stat",
+				"colors": [
+					{
+						"id": "base",
+						"type": "text",
+						"hex": "#7CE490",
+						"name": "honeydew",
+						"value": "-1000000000000000000"
+					},
+					{
+						"id": "1b53e85c-c35f-4370-8e8d-6b0cf89a0b8e",
+						"type": "text",
+						"hex": "#00C9FF",
+						"name": "laser",
+						"value": "0"
+					}
+				],
+				"legend": {},
+				"tableOptions": {
+					"verticalTimeAxis": true,
+					"sortBy": {
+						"internalName": "time",
+						"displayName": "",
+						"visible": true
+					},
+					"wrapping": "truncate",
+					"fixFirstColumn": true
+				},
+				"fieldOptions": [
+					{
+						"internalName": "time",
+						"displayName": "",
+						"visible": true
+					}
+				],
+				"timeFormat": "MM/DD/YYYY HH:mm:ss",
+				"decimalPlaces": {
+					"isEnforced": true,
+					"digits": 0
+				},
+				"note": "",
+				"noteVisibility": "default",
+				"links": {
+					"self": "/chronograf/v1/dashboards/3/cells/eb47392a-bd91-4acb-ba3e-7dbf0bf8069f"
+				}
+			},
+			{
+				"i": "14f584b0-9837-441d-8eef-9ba2f16e519a",
 				"x": 8,
 				"y": 5,
 				"w": 1,
@@ -153,7 +516,7 @@
 				"name": "JPN",
 				"queries": [
 					{
-						"query": "SELECT sum(\"value\") AS \"v_value\" FROM \"gdelt\".\"autogen\".\"GDE_D040_STR\" WHERE time < :upperDashboardTime: AND \"id\"='JPN' GROUP BY time(:interval:) FILL(null)",
+						"query": "SELECT sum(\"value\") AS \"v_value\" FROM \"gdelt\".\"autogen\".\"GDE_D040_STR\" WHERE time > now() - 1m AND (\"id\"='JPN' OR \"id\"='Japan') GROUP BY time(:interval:) FILL(null)",
 						"queryConfig": {
 							"database": "gdelt",
 							"measurement": "GDE_D040_STR",
@@ -174,7 +537,8 @@
 							],
 							"tags": {
 								"id": [
-									"JPN"
+									"JPN",
+									"Japan"
 								]
 							},
 							"groupBy": {
@@ -270,11 +634,11 @@
 				"note": "USA\t",
 				"noteVisibility": "default",
 				"links": {
-					"self": "/chronograf/v1/dashboards/2/cells/87764ff4-f4b9-47fd-a4c5-def723d58a31"
+					"self": "/chronograf/v1/dashboards/3/cells/14f584b0-9837-441d-8eef-9ba2f16e519a"
 				}
 			},
 			{
-				"i": "7c596e29-ebe2-4c22-8758-0ff36abbd223",
+				"i": "594414c0-f43d-4a4d-a68d-23dfc2124477",
 				"x": 7,
 				"y": 5,
 				"w": 1,
@@ -399,11 +763,11 @@
 				"note": "USA\t",
 				"noteVisibility": "default",
 				"links": {
-					"self": "/chronograf/v1/dashboards/2/cells/7c596e29-ebe2-4c22-8758-0ff36abbd223"
+					"self": "/chronograf/v1/dashboards/3/cells/594414c0-f43d-4a4d-a68d-23dfc2124477"
 				}
 			},
 			{
-				"i": "57fd4689-2dbd-4590-a846-b2aa7e581143",
+				"i": "3975b0c5-9615-43c2-b566-d36e3dfbcb3f",
 				"x": 6,
 				"y": 5,
 				"w": 1,
@@ -411,7 +775,7 @@
 				"name": "AUS",
 				"queries": [
 					{
-						"query": "SELECT sum(\"value\") AS \"v_value\" FROM \"gdelt\".\"autogen\".\"GDE_D040_STR\" WHERE time < :upperDashboardTime: AND \"id\"='AUS' GROUP BY time(:interval:) FILL(null)",
+						"query": "SELECT sum(\"value\") AS \"v_value\" FROM \"gdelt\".\"autogen\".\"GDE_D040_STR\" WHERE time > now() - 1m AND (\"id\"='AUS' OR \"id\"='Australia') GROUP BY time(:interval:) FILL(null)",
 						"queryConfig": {
 							"database": "gdelt",
 							"measurement": "GDE_D040_STR",
@@ -432,7 +796,8 @@
 							],
 							"tags": {
 								"id": [
-									"AUS"
+									"AUS",
+									"Australia"
 								]
 							},
 							"groupBy": {
@@ -528,11 +893,11 @@
 				"note": "USA\t",
 				"noteVisibility": "default",
 				"links": {
-					"self": "/chronograf/v1/dashboards/2/cells/57fd4689-2dbd-4590-a846-b2aa7e581143"
+					"self": "/chronograf/v1/dashboards/3/cells/3975b0c5-9615-43c2-b566-d36e3dfbcb3f"
 				}
 			},
 			{
-				"i": "0c79881c-33c7-490e-839e-7e8b7a64f967",
+				"i": "4e0ee5bf-a8b7-4db2-a17a-4937fd6fc3c6",
 				"x": 5,
 				"y": 5,
 				"w": 1,
@@ -540,7 +905,7 @@
 				"name": "ITA",
 				"queries": [
 					{
-						"query": "SELECT sum(\"value\") AS \"v_value\" FROM \"gdelt\".\"autogen\".\"GDE_D040_STR\" WHERE time < :upperDashboardTime: AND \"id\"='ITA' GROUP BY time(:interval:) FILL(null)",
+						"query": "SELECT sum(\"value\") AS \"v_value\" FROM \"gdelt\".\"autogen\".\"GDE_D040_STR\" WHERE time > now() - 1m AND (\"id\"='ITA' OR \"id\"='Italy') GROUP BY time(:interval:) FILL(null)",
 						"queryConfig": {
 							"database": "gdelt",
 							"measurement": "GDE_D040_STR",
@@ -561,7 +926,8 @@
 							],
 							"tags": {
 								"id": [
-									"ITA"
+									"ITA",
+									"Italy"
 								]
 							},
 							"groupBy": {
@@ -657,11 +1023,11 @@
 				"note": "USA\t",
 				"noteVisibility": "default",
 				"links": {
-					"self": "/chronograf/v1/dashboards/2/cells/0c79881c-33c7-490e-839e-7e8b7a64f967"
+					"self": "/chronograf/v1/dashboards/3/cells/4e0ee5bf-a8b7-4db2-a17a-4937fd6fc3c6"
 				}
 			},
 			{
-				"i": "b71f6369-106f-47e8-979c-4defd771d5bc",
+				"i": "7933696b-ca34-4b51-ae15-f8817d545909",
 				"x": 4,
 				"y": 5,
 				"w": 1,
@@ -786,11 +1152,11 @@
 				"note": "USA\t",
 				"noteVisibility": "default",
 				"links": {
-					"self": "/chronograf/v1/dashboards/2/cells/b71f6369-106f-47e8-979c-4defd771d5bc"
+					"self": "/chronograf/v1/dashboards/3/cells/7933696b-ca34-4b51-ae15-f8817d545909"
 				}
 			},
 			{
-				"i": "84a5cf1e-3acb-426f-9014-e737bb7b5917",
+				"i": "fcc0cfd3-d25b-40dd-86c9-072dcd192d16",
 				"x": 3,
 				"y": 5,
 				"w": 1,
@@ -798,7 +1164,7 @@
 				"name": "CHN",
 				"queries": [
 					{
-						"query": "SELECT sum(\"value\") AS \"v_value\" FROM \"gdelt\".\"autogen\".\"GDE_D040_STR\" WHERE time < :upperDashboardTime: AND \"id\"='CHN' GROUP BY time(:interval:) FILL(null)",
+						"query": "SELECT sum(\"value\") AS \"v_value\" FROM \"gdelt\".\"autogen\".\"GDE_D040_STR\" WHERE time > now() - 1m AND (\"id\"='CHN' OR \"id\"='China') GROUP BY time(:interval:) FILL(null)",
 						"queryConfig": {
 							"database": "gdelt",
 							"measurement": "GDE_D040_STR",
@@ -819,7 +1185,8 @@
 							],
 							"tags": {
 								"id": [
-									"CHN"
+									"CHN",
+									"China"
 								]
 							},
 							"groupBy": {
@@ -915,11 +1282,11 @@
 				"note": "USA\t",
 				"noteVisibility": "default",
 				"links": {
-					"self": "/chronograf/v1/dashboards/2/cells/84a5cf1e-3acb-426f-9014-e737bb7b5917"
+					"self": "/chronograf/v1/dashboards/3/cells/fcc0cfd3-d25b-40dd-86c9-072dcd192d16"
 				}
 			},
 			{
-				"i": "4bae8671-1067-413b-a99c-b4ecd14e5d9a",
+				"i": "640108d6-fb6d-4c59-978f-9eb1226d5f4f",
 				"x": 2,
 				"y": 5,
 				"w": 1,
@@ -927,16 +1294,16 @@
 				"name": "IRL",
 				"queries": [
 					{
-						"query": "SELECT sum(\"value\") AS \"v_value\" FROM \"gdelt\".\"autogen\".\"GDE_D040_STR\" WHERE time < :upperDashboardTime: AND \"id\"='IRL' GROUP BY time(:interval:) FILL(null)",
+						"query": "SELECT mean(\"value\") AS \"mean_value\" FROM \"gdelt\".\"autogen\".\"GDE_D040_STR\" WHERE time > now() - 1m AND (\"id\"='IRL' OR \"id\"='Ireland') GROUP BY time(:interval:) FILL(null)",
 						"queryConfig": {
 							"database": "gdelt",
 							"measurement": "GDE_D040_STR",
 							"retentionPolicy": "autogen",
 							"fields": [
 								{
-									"value": "sum",
+									"value": "mean",
 									"type": "func",
-									"alias": "v_value",
+									"alias": "mean_value",
 									"args": [
 										{
 											"value": "value",
@@ -948,7 +1315,8 @@
 							],
 							"tags": {
 								"id": [
-									"IRL"
+									"IRL",
+									"Ireland"
 								]
 							},
 							"groupBy": {
@@ -1044,11 +1412,11 @@
 				"note": "USA\t",
 				"noteVisibility": "default",
 				"links": {
-					"self": "/chronograf/v1/dashboards/2/cells/4bae8671-1067-413b-a99c-b4ecd14e5d9a"
+					"self": "/chronograf/v1/dashboards/3/cells/640108d6-fb6d-4c59-978f-9eb1226d5f4f"
 				}
 			},
 			{
-				"i": "f8b37c2b-d7e8-412d-9cbf-0a1f8b2f83bf",
+				"i": "9e369fa8-a754-4f2a-b3b1-21a33d3a56d5",
 				"x": 1,
 				"y": 5,
 				"w": 1,
@@ -1056,7 +1424,7 @@
 				"name": "GBR",
 				"queries": [
 					{
-						"query": "SELECT sum(\"value\") AS \"v_value\" FROM \"gdelt\".\"autogen\".\"GDE_D040_STR\" WHERE time < :upperDashboardTime: AND \"id\"='GBR' GROUP BY time(:interval:) FILL(null)",
+						"query": "SELECT sum(\"value\") AS \"v_value\" FROM \"gdelt\".\"autogen\".\"GDE_D040_STR\" WHERE time > now() - 1m AND (\"id\"='GBR' OR \"id\"='United Kingdom') GROUP BY time(:interval:) FILL(null)",
 						"queryConfig": {
 							"database": "gdelt",
 							"measurement": "GDE_D040_STR",
@@ -1077,7 +1445,8 @@
 							],
 							"tags": {
 								"id": [
-									"GBR"
+									"GBR",
+									"United Kingdom"
 								]
 							},
 							"groupBy": {
@@ -1173,11 +1542,11 @@
 				"note": "USA\t",
 				"noteVisibility": "default",
 				"links": {
-					"self": "/chronograf/v1/dashboards/2/cells/f8b37c2b-d7e8-412d-9cbf-0a1f8b2f83bf"
+					"self": "/chronograf/v1/dashboards/3/cells/9e369fa8-a754-4f2a-b3b1-21a33d3a56d5"
 				}
 			},
 			{
-				"i": "ff7adfd9-fdc8-4fc1-b602-4f62dc671195",
+				"i": "a0068d16-5586-4546-a47e-270140d2ec91",
 				"x": 0,
 				"y": 5,
 				"w": 1,
@@ -1185,7 +1554,7 @@
 				"name": "USA",
 				"queries": [
 					{
-						"query": "SELECT sum(\"value\") AS \"v_value\" FROM \"gdelt\".\"autogen\".\"GDE_D040_STR\" WHERE time < :upperDashboardTime: AND \"id\"='USA' GROUP BY time(:interval:) FILL(null)",
+						"query": "SELECT sum(\"value\") AS \"v_value\" FROM \"gdelt\".\"autogen\".\"GDE_D040_STR\" WHERE time > now() - 1m AND (\"id\"='USA' OR \"id\"='United States') GROUP BY time(:interval:) FILL(null)",
 						"queryConfig": {
 							"database": "gdelt",
 							"measurement": "GDE_D040_STR",
@@ -1206,7 +1575,8 @@
 							],
 							"tags": {
 								"id": [
-									"USA"
+									"USA",
+									"United States"
 								]
 							},
 							"groupBy": {
@@ -1302,19 +1672,19 @@
 				"note": "USA\t",
 				"noteVisibility": "default",
 				"links": {
-					"self": "/chronograf/v1/dashboards/2/cells/ff7adfd9-fdc8-4fc1-b602-4f62dc671195"
+					"self": "/chronograf/v1/dashboards/3/cells/a0068d16-5586-4546-a47e-270140d2ec91"
 				}
 			},
 			{
-				"i": "4a72ebe0-e75f-4d2a-9e7b-b0b7d065b71b",
+				"i": "ac8d59aa-29b3-49bd-b098-8b00a108eabc",
 				"x": 8,
 				"y": 3,
 				"w": 2,
 				"h": 2,
-				"name": "GDE_070",
+				"name": "GDE_D040_STR",
 				"queries": [
 					{
-						"query": "SELECT last(\"OneMinuteRate\") AS \"last_OneMinuteRate\" FROM \"gde-db\".\"autogen\".\"GDE_Metrics\" WHERE time > :dashboardTime: AND time < :upperDashboardTime: AND (\"typeName\"='type=BrokerTopicMetrics,name=MessagesInPerSec,topic=GDE_D040_STR' OR \"typeName\"='type=BrokerTopicMetrics,name=TotalFetchRequestsPerSec,topic=GDE_D030_STR') GROUP BY time(:interval:) FILL(null)",
+						"query": "SELECT last(\"OneMinuteRate\") AS \"last_OneMinuteRate\" FROM \"gde-db\".\"autogen\".\"GDE_Metrics\" WHERE time > :dashboardTime: AND time < :upperDashboardTime: AND ( \"typeName\"='type=BrokerTopicMetrics,name=MessagesInPerSec,topic=GDE_D040_STR') GROUP BY time(:interval:) FILL(null)",
 						"queryConfig": {
 							"database": "gde-db",
 							"measurement": "GDE_Metrics",
@@ -1335,8 +1705,7 @@
 							],
 							"tags": {
 								"typeName": [
-									"type=BrokerTopicMetrics,name=MessagesInPerSec,topic=GDE_D040_STR",
-									"type=BrokerTopicMetrics,name=TotalFetchRequestsPerSec,topic=GDE_D030_STR"
+									"type=BrokerTopicMetrics,name=MessagesInPerSec,topic=GDE_D040_STR"
 								]
 							},
 							"groupBy": {
@@ -1388,27 +1757,27 @@
 						"scale": "linear"
 					}
 				},
-				"type": "line",
+				"type": "line-plus-single-stat",
 				"colors": [
 					{
-						"id": "fe47c693-6bed-43a9-b530-2e332f77330b",
+						"id": "base",
 						"type": "scale",
-						"hex": "#31C0F6",
-						"name": "Nineteen Eighty Four",
+						"hex": "#FD7A5D",
+						"name": "Delorean",
 						"value": "0"
 					},
 					{
-						"id": "4df500a0-2471-4a2b-852d-7dbb131574c5",
+						"id": "499bf862-fe08-48f1-8a32-2d76dc3ffac9",
 						"type": "scale",
-						"hex": "#A500A5",
-						"name": "Nineteen Eighty Four",
+						"hex": "#5F1CF2",
+						"name": "Delorean",
 						"value": "0"
 					},
 					{
-						"id": "609f7c51-172f-4a3e-9ab1-1950188713a1",
+						"id": "d1625ff1-657a-460e-bc7c-665b64a7d034",
 						"type": "scale",
-						"hex": "#FF7E27",
-						"name": "Nineteen Eighty Four",
+						"hex": "#4CE09A",
+						"name": "Delorean",
 						"value": "0"
 					}
 				],
@@ -1438,16 +1807,16 @@
 				"note": "",
 				"noteVisibility": "default",
 				"links": {
-					"self": "/chronograf/v1/dashboards/2/cells/4a72ebe0-e75f-4d2a-9e7b-b0b7d065b71b"
+					"self": "/chronograf/v1/dashboards/3/cells/ac8d59aa-29b3-49bd-b098-8b00a108eabc"
 				}
 			},
 			{
-				"i": "625f44dd-ada9-4539-8909-4dbeede2f628",
+				"i": "c417cf08-0b21-4c82-a88b-2196de7f01f0",
 				"x": 3,
 				"y": 0,
-				"w": 3,
+				"w": 2,
 				"h": 3,
-				"name": "Messages In",
+				"name": "K/Connect JDBC Source - Records/Sec",
 				"queries": [
 					{
 						"query": "SELECT mean(\"source-record-write-rate\") AS \"mean_source-record-write-rate\" FROM \"db-connect\".\"autogen\".\"connect-source\" WHERE time > :dashboardTime: AND time < :upperDashboardTime: AND \"typeName\"='type=source-task-metrics,connector=SOURCE_JDBC_GDELT_EVENT,task=0' GROUP BY time(:interval:) FILL(null)",
@@ -1566,19 +1935,19 @@
 				"note": "",
 				"noteVisibility": "default",
 				"links": {
-					"self": "/chronograf/v1/dashboards/2/cells/625f44dd-ada9-4539-8909-4dbeede2f628"
+					"self": "/chronograf/v1/dashboards/3/cells/c417cf08-0b21-4c82-a88b-2196de7f01f0"
 				}
 			},
 			{
-				"i": "4193ec9c-5de9-4777-afce-0b6227f120d1",
-				"x": 6,
+				"i": "4655c000-9db5-4513-94e3-bb3d973d9dd8",
+				"x": 4,
 				"y": 3,
 				"w": 2,
 				"h": 2,
-				"name": "GDE_060",
+				"name": "GDE_D10_STR",
 				"queries": [
 					{
-						"query": "SELECT last(\"OneMinuteRate\") AS \"last_OneMinuteRate\" FROM \"gde-db\".\"autogen\".\"GDE_Metrics\" WHERE time > :dashboardTime: AND time < :upperDashboardTime: AND (\"typeName\"='type=BrokerTopicMetrics,name=MessagesInPerSec,topic=GDE_A020_STR') GROUP BY time(:interval:) FILL(null)",
+						"query": "SELECT last(\"OneMinuteRate\") AS \"last_OneMinuteRate\" FROM \"gde-db\".\"autogen\".\"GDE_Metrics\" WHERE time > :dashboardTime: AND time < :upperDashboardTime: AND (\"typeName\"='type=BrokerTopicMetrics,name=MessagesInPerSec,topic=GDE_A020_STR' OR \"typeName\"='type=BrokerTopicMetrics,name=MessagesInPerSec,topic=GDE_D010_STR') GROUP BY time(:interval:) FILL(null)",
 						"queryConfig": {
 							"database": "gde-db",
 							"measurement": "GDE_Metrics",
@@ -1599,6 +1968,278 @@
 							],
 							"tags": {
 								"typeName": [
+									"type=BrokerTopicMetrics,name=MessagesInPerSec,topic=GDE_A020_STR",
+									"type=BrokerTopicMetrics,name=MessagesInPerSec,topic=GDE_D010_STR"
+								]
+							},
+							"groupBy": {
+								"time": "auto",
+								"tags": []
+							},
+							"areTagsAccepted": true,
+							"fill": "null",
+							"rawText": null,
+							"range": null,
+							"shifts": null
+						},
+						"source": "/chronograf/v1/sources/1",
+						"type": "influxql"
+					}
+				],
+				"axes": {
+					"x": {
+						"bounds": [
+							"",
+							""
+						],
+						"label": "",
+						"prefix": "",
+						"suffix": "",
+						"base": "10",
+						"scale": "linear"
+					},
+					"y": {
+						"bounds": [
+							"",
+							""
+						],
+						"label": "",
+						"prefix": "",
+						"suffix": "",
+						"base": "10",
+						"scale": "linear"
+					},
+					"y2": {
+						"bounds": [
+							"",
+							""
+						],
+						"label": "",
+						"prefix": "",
+						"suffix": "",
+						"base": "10",
+						"scale": "linear"
+					}
+				},
+				"type": "line-plus-single-stat",
+				"colors": [
+					{
+						"id": "base",
+						"type": "scale",
+						"hex": "#FD7A5D",
+						"name": "Delorean",
+						"value": "0"
+					},
+					{
+						"id": "499bf862-fe08-48f1-8a32-2d76dc3ffac9",
+						"type": "scale",
+						"hex": "#5F1CF2",
+						"name": "Delorean",
+						"value": "0"
+					},
+					{
+						"id": "d1625ff1-657a-460e-bc7c-665b64a7d034",
+						"type": "scale",
+						"hex": "#4CE09A",
+						"name": "Delorean",
+						"value": "0"
+					}
+				],
+				"legend": {},
+				"tableOptions": {
+					"verticalTimeAxis": true,
+					"sortBy": {
+						"internalName": "time",
+						"displayName": "",
+						"visible": true
+					},
+					"wrapping": "truncate",
+					"fixFirstColumn": true
+				},
+				"fieldOptions": [
+					{
+						"internalName": "time",
+						"displayName": "",
+						"visible": true
+					}
+				],
+				"timeFormat": "MM/DD/YYYY HH:mm:ss",
+				"decimalPlaces": {
+					"isEnforced": true,
+					"digits": 2
+				},
+				"note": "",
+				"noteVisibility": "default",
+				"links": {
+					"self": "/chronograf/v1/dashboards/3/cells/4655c000-9db5-4513-94e3-bb3d973d9dd8"
+				}
+			},
+			{
+				"i": "5142c21e-d13f-488f-9149-80c38b955bcc",
+				"x": 6,
+				"y": 3,
+				"w": 2,
+				"h": 2,
+				"name": "GDE_D020_TAB",
+				"queries": [
+					{
+						"query": "SELECT last(\"OneMinuteRate\") AS \"last_OneMinuteRate\" FROM \"gde-db\".\"autogen\".\"GDE_Metrics\" WHERE time > :dashboardTime: AND time < :upperDashboardTime: AND ( \"typeName\"='type=BrokerTopicMetrics,name=MessagesInPerSec,topic=GDE_D020_TAB') GROUP BY time(:interval:) FILL(null)",
+						"queryConfig": {
+							"database": "gde-db",
+							"measurement": "GDE_Metrics",
+							"retentionPolicy": "autogen",
+							"fields": [
+								{
+									"value": "last",
+									"type": "func",
+									"alias": "last_OneMinuteRate",
+									"args": [
+										{
+											"value": "OneMinuteRate",
+											"type": "field",
+											"alias": ""
+										}
+									]
+								}
+							],
+							"tags": {
+								"typeName": [
+									"type=BrokerTopicMetrics,name=MessagesInPerSec,topic=GDE_D020_TAB"
+								]
+							},
+							"groupBy": {
+								"time": "auto",
+								"tags": []
+							},
+							"areTagsAccepted": true,
+							"fill": "null",
+							"rawText": null,
+							"range": null,
+							"shifts": null
+						},
+						"source": "/chronograf/v1/sources/1",
+						"type": "influxql"
+					}
+				],
+				"axes": {
+					"x": {
+						"bounds": [
+							"",
+							""
+						],
+						"label": "",
+						"prefix": "",
+						"suffix": "",
+						"base": "10",
+						"scale": "linear"
+					},
+					"y": {
+						"bounds": [
+							"",
+							""
+						],
+						"label": "",
+						"prefix": "",
+						"suffix": "",
+						"base": "10",
+						"scale": "linear"
+					},
+					"y2": {
+						"bounds": [
+							"",
+							""
+						],
+						"label": "",
+						"prefix": "",
+						"suffix": "",
+						"base": "10",
+						"scale": "linear"
+					}
+				},
+				"type": "line-plus-single-stat",
+				"colors": [
+					{
+						"id": "base",
+						"type": "scale",
+						"hex": "#FD7A5D",
+						"name": "Delorean",
+						"value": "0"
+					},
+					{
+						"id": "499bf862-fe08-48f1-8a32-2d76dc3ffac9",
+						"type": "scale",
+						"hex": "#5F1CF2",
+						"name": "Delorean",
+						"value": "0"
+					},
+					{
+						"id": "d1625ff1-657a-460e-bc7c-665b64a7d034",
+						"type": "scale",
+						"hex": "#4CE09A",
+						"name": "Delorean",
+						"value": "0"
+					}
+				],
+				"legend": {},
+				"tableOptions": {
+					"verticalTimeAxis": true,
+					"sortBy": {
+						"internalName": "time",
+						"displayName": "",
+						"visible": true
+					},
+					"wrapping": "truncate",
+					"fixFirstColumn": true
+				},
+				"fieldOptions": [
+					{
+						"internalName": "time",
+						"displayName": "",
+						"visible": true
+					}
+				],
+				"timeFormat": "MM/DD/YYYY HH:mm:ss",
+				"decimalPlaces": {
+					"isEnforced": true,
+					"digits": 2
+				},
+				"note": "",
+				"noteVisibility": "default",
+				"links": {
+					"self": "/chronograf/v1/dashboards/3/cells/5142c21e-d13f-488f-9149-80c38b955bcc"
+				}
+			},
+			{
+				"i": "920fabe5-b0bb-474e-be44-56b95be7e94d",
+				"x": 0,
+				"y": 3,
+				"w": 2,
+				"h": 2,
+				"name": "GDE_A020_STR",
+				"queries": [
+					{
+						"query": "SELECT mean(\"OneMinuteRate\") AS \"mean_OneMinuteRate\" FROM \"gde-db\".\"autogen\".\"GDE_Metrics\" WHERE time > :dashboardTime: AND time < :upperDashboardTime: AND (\"typeName\"='type=BrokerTopicMetrics,name=MessagesInPerSec,topic=GDE_B020_TAB' OR \"typeName\"='type=BrokerTopicMetrics,name=MessagesInPerSec,topic=GDE_A020_STR') GROUP BY time(:interval:) FILL(null)",
+						"queryConfig": {
+							"database": "gde-db",
+							"measurement": "GDE_Metrics",
+							"retentionPolicy": "autogen",
+							"fields": [
+								{
+									"value": "mean",
+									"type": "func",
+									"alias": "mean_OneMinuteRate",
+									"args": [
+										{
+											"value": "OneMinuteRate",
+											"type": "field",
+											"alias": ""
+										}
+									]
+								}
+							],
+							"tags": {
+								"typeName": [
+									"type=BrokerTopicMetrics,name=MessagesInPerSec,topic=GDE_B020_TAB",
 									"type=BrokerTopicMetrics,name=MessagesInPerSec,topic=GDE_A020_STR"
 								]
 							},
@@ -1651,27 +2292,27 @@
 						"scale": "linear"
 					}
 				},
-				"type": "line",
+				"type": "line-plus-single-stat",
 				"colors": [
 					{
-						"id": "fe47c693-6bed-43a9-b530-2e332f77330b",
+						"id": "base",
 						"type": "scale",
-						"hex": "#31C0F6",
-						"name": "Nineteen Eighty Four",
+						"hex": "#FD7A5D",
+						"name": "Delorean",
 						"value": "0"
 					},
 					{
-						"id": "4df500a0-2471-4a2b-852d-7dbb131574c5",
+						"id": "499bf862-fe08-48f1-8a32-2d76dc3ffac9",
 						"type": "scale",
-						"hex": "#A500A5",
-						"name": "Nineteen Eighty Four",
+						"hex": "#5F1CF2",
+						"name": "Delorean",
 						"value": "0"
 					},
 					{
-						"id": "609f7c51-172f-4a3e-9ab1-1950188713a1",
+						"id": "d1625ff1-657a-460e-bc7c-665b64a7d034",
 						"type": "scale",
-						"hex": "#FF7E27",
-						"name": "Nineteen Eighty Four",
+						"hex": "#4CE09A",
+						"name": "Delorean",
 						"value": "0"
 					}
 				],
@@ -1701,290 +2342,19 @@
 				"note": "",
 				"noteVisibility": "default",
 				"links": {
-					"self": "/chronograf/v1/dashboards/2/cells/4193ec9c-5de9-4777-afce-0b6227f120d1"
+					"self": "/chronograf/v1/dashboards/3/cells/920fabe5-b0bb-474e-be44-56b95be7e94d"
 				}
 			},
 			{
-				"i": "418b2e95-3ba5-4f4d-8691-38c502af1a13",
-				"x": 0,
-				"y": 3,
-				"w": 2,
-				"h": 2,
-				"name": "GDE_020",
-				"queries": [
-					{
-						"query": "SELECT last(\"OneMinuteRate\") AS \"last_OneMinuteRate\" FROM \"gde-db\".\"autogen\".\"GDE_Metrics\" WHERE time > :dashboardTime: AND time < :upperDashboardTime: AND (\"typeName\"='type=BrokerTopicMetrics,name=MessagesInPerSec,topic=GDE_C020_STR' OR \"typeName\"='type=BrokerTopicMetrics,name=BytesOutPerSec,topic=GDE_B020_TAB') GROUP BY time(:interval:) FILL(null)",
-						"queryConfig": {
-							"database": "gde-db",
-							"measurement": "GDE_Metrics",
-							"retentionPolicy": "autogen",
-							"fields": [
-								{
-									"value": "last",
-									"type": "func",
-									"alias": "last_OneMinuteRate",
-									"args": [
-										{
-											"value": "OneMinuteRate",
-											"type": "field",
-											"alias": ""
-										}
-									]
-								}
-							],
-							"tags": {
-								"typeName": [
-									"type=BrokerTopicMetrics,name=MessagesInPerSec,topic=GDE_C020_STR",
-									"type=BrokerTopicMetrics,name=BytesOutPerSec,topic=GDE_B020_TAB"
-								]
-							},
-							"groupBy": {
-								"time": "auto",
-								"tags": []
-							},
-							"areTagsAccepted": true,
-							"fill": "null",
-							"rawText": null,
-							"range": null,
-							"shifts": null
-						},
-						"source": "/chronograf/v1/sources/1",
-						"type": "influxql"
-					}
-				],
-				"axes": {
-					"x": {
-						"bounds": [
-							"",
-							""
-						],
-						"label": "",
-						"prefix": "",
-						"suffix": "",
-						"base": "10",
-						"scale": "linear"
-					},
-					"y": {
-						"bounds": [
-							"",
-							""
-						],
-						"label": "",
-						"prefix": "",
-						"suffix": "",
-						"base": "10",
-						"scale": "linear"
-					},
-					"y2": {
-						"bounds": [
-							"",
-							""
-						],
-						"label": "",
-						"prefix": "",
-						"suffix": "",
-						"base": "10",
-						"scale": "linear"
-					}
-				},
-				"type": "line",
-				"colors": [
-					{
-						"id": "fe47c693-6bed-43a9-b530-2e332f77330b",
-						"type": "scale",
-						"hex": "#31C0F6",
-						"name": "Nineteen Eighty Four",
-						"value": "0"
-					},
-					{
-						"id": "4df500a0-2471-4a2b-852d-7dbb131574c5",
-						"type": "scale",
-						"hex": "#A500A5",
-						"name": "Nineteen Eighty Four",
-						"value": "0"
-					},
-					{
-						"id": "609f7c51-172f-4a3e-9ab1-1950188713a1",
-						"type": "scale",
-						"hex": "#FF7E27",
-						"name": "Nineteen Eighty Four",
-						"value": "0"
-					}
-				],
-				"legend": {},
-				"tableOptions": {
-					"verticalTimeAxis": true,
-					"sortBy": {
-						"internalName": "time",
-						"displayName": "",
-						"visible": true
-					},
-					"wrapping": "truncate",
-					"fixFirstColumn": true
-				},
-				"fieldOptions": [
-					{
-						"internalName": "time",
-						"displayName": "",
-						"visible": true
-					}
-				],
-				"timeFormat": "MM/DD/YYYY HH:mm:ss",
-				"decimalPlaces": {
-					"isEnforced": true,
-					"digits": 2
-				},
-				"note": "",
-				"noteVisibility": "default",
-				"links": {
-					"self": "/chronograf/v1/dashboards/2/cells/418b2e95-3ba5-4f4d-8691-38c502af1a13"
-				}
-			},
-			{
-				"i": "098a725b-6fea-4ed7-b551-5044e209e5ea",
+				"i": "93ca21be-ea99-419d-a246-b5e6993f9639",
 				"x": 2,
 				"y": 3,
 				"w": 2,
 				"h": 2,
-				"name": "GDE_040",
+				"name": "GDE_B10_TAB",
 				"queries": [
 					{
-						"query": "SELECT mean(\"OneMinuteRate\") AS \"mean_OneMinuteRate\" FROM \"gde-db\".\"autogen\".\"GDE_Metrics\" WHERE time > :dashboardTime: AND time < :upperDashboardTime: AND ( \"typeName\"='type=BrokerTopicMetrics,name=MessagesInPerSec,topic=GDE_B020_TAB') GROUP BY time(:interval:) FILL(null)",
-						"queryConfig": {
-							"database": "gde-db",
-							"measurement": "GDE_Metrics",
-							"retentionPolicy": "autogen",
-							"fields": [
-								{
-									"value": "mean",
-									"type": "func",
-									"alias": "mean_OneMinuteRate",
-									"args": [
-										{
-											"value": "OneMinuteRate",
-											"type": "field",
-											"alias": ""
-										}
-									]
-								}
-							],
-							"tags": {
-								"typeName": [
-									"type=BrokerTopicMetrics,name=MessagesInPerSec,topic=GDE_B020_TAB"
-								]
-							},
-							"groupBy": {
-								"time": "auto",
-								"tags": []
-							},
-							"areTagsAccepted": true,
-							"fill": "null",
-							"rawText": null,
-							"range": null,
-							"shifts": null
-						},
-						"source": "/chronograf/v1/sources/1",
-						"type": "influxql"
-					}
-				],
-				"axes": {
-					"x": {
-						"bounds": [
-							"",
-							""
-						],
-						"label": "",
-						"prefix": "",
-						"suffix": "",
-						"base": "10",
-						"scale": "linear"
-					},
-					"y": {
-						"bounds": [
-							"",
-							""
-						],
-						"label": "",
-						"prefix": "",
-						"suffix": "",
-						"base": "10",
-						"scale": "linear"
-					},
-					"y2": {
-						"bounds": [
-							"",
-							""
-						],
-						"label": "",
-						"prefix": "",
-						"suffix": "",
-						"base": "10",
-						"scale": "linear"
-					}
-				},
-				"type": "line",
-				"colors": [
-					{
-						"id": "fe47c693-6bed-43a9-b530-2e332f77330b",
-						"type": "scale",
-						"hex": "#31C0F6",
-						"name": "Nineteen Eighty Four",
-						"value": "0"
-					},
-					{
-						"id": "4df500a0-2471-4a2b-852d-7dbb131574c5",
-						"type": "scale",
-						"hex": "#A500A5",
-						"name": "Nineteen Eighty Four",
-						"value": "0"
-					},
-					{
-						"id": "609f7c51-172f-4a3e-9ab1-1950188713a1",
-						"type": "scale",
-						"hex": "#FF7E27",
-						"name": "Nineteen Eighty Four",
-						"value": "0"
-					}
-				],
-				"legend": {},
-				"tableOptions": {
-					"verticalTimeAxis": true,
-					"sortBy": {
-						"internalName": "time",
-						"displayName": "",
-						"visible": true
-					},
-					"wrapping": "truncate",
-					"fixFirstColumn": true
-				},
-				"fieldOptions": [
-					{
-						"internalName": "time",
-						"displayName": "",
-						"visible": true
-					}
-				],
-				"timeFormat": "MM/DD/YYYY HH:mm:ss",
-				"decimalPlaces": {
-					"isEnforced": true,
-					"digits": 2
-				},
-				"note": "",
-				"noteVisibility": "default",
-				"links": {
-					"self": "/chronograf/v1/dashboards/2/cells/098a725b-6fea-4ed7-b551-5044e209e5ea"
-				}
-			},
-			{
-				"i": "23ea84a7-7fb0-4f52-8770-3ddc69036687",
-				"x": 4,
-				"y": 3,
-				"w": 2,
-				"h": 2,
-				"name": "GDE_D030",
-				"queries": [
-					{
-						"query": "SELECT mean(\"OneMinuteRate\") AS \"mean_OneMinuteRate\" FROM \"gde-db\".\"autogen\".\"GDE_Metrics\" WHERE time > :dashboardTime: AND time < :upperDashboardTime: AND (\"typeName\"='type=BrokerTopicMetrics,name=MessagesInPerSec,topic=GDE_D030_STR' OR \"typeName\"='type=BrokerTopicMetrics,name=TotalFetchRequestsPerSec,topic=GDE_D030_STR') GROUP BY time(:interval:) FILL(null)",
+						"query": "SELECT mean(\"OneMinuteRate\") AS \"mean_OneMinuteRate\" FROM \"gde-db\".\"autogen\".\"GDE_Metrics\" WHERE time > :dashboardTime: AND time < :upperDashboardTime: AND (\"typeName\"='type=BrokerTopicMetrics,name=MessagesInPerSec,topic=GDE_D030_STR' OR \"typeName\"='type=BrokerTopicMetrics,name=TotalFetchRequestsPerSec,topic=GDE_D030_STR' OR \"typeName\"='type=BrokerTopicMetrics,name=MessagesInPerSec,topic=GDE_B010_TAB') GROUP BY time(:interval:) FILL(null)",
 						"queryConfig": {
 							"database": "gde-db",
 							"measurement": "GDE_Metrics",
@@ -2006,7 +2376,8 @@
 							"tags": {
 								"typeName": [
 									"type=BrokerTopicMetrics,name=MessagesInPerSec,topic=GDE_D030_STR",
-									"type=BrokerTopicMetrics,name=TotalFetchRequestsPerSec,topic=GDE_D030_STR"
+									"type=BrokerTopicMetrics,name=TotalFetchRequestsPerSec,topic=GDE_D030_STR",
+									"type=BrokerTopicMetrics,name=MessagesInPerSec,topic=GDE_B010_TAB"
 								]
 							},
 							"groupBy": {
@@ -2058,27 +2429,27 @@
 						"scale": "linear"
 					}
 				},
-				"type": "line",
+				"type": "line-plus-single-stat",
 				"colors": [
 					{
-						"id": "fe47c693-6bed-43a9-b530-2e332f77330b",
+						"id": "base",
 						"type": "scale",
-						"hex": "#31C0F6",
-						"name": "Nineteen Eighty Four",
+						"hex": "#FD7A5D",
+						"name": "Delorean",
 						"value": "0"
 					},
 					{
-						"id": "4df500a0-2471-4a2b-852d-7dbb131574c5",
+						"id": "499bf862-fe08-48f1-8a32-2d76dc3ffac9",
 						"type": "scale",
-						"hex": "#A500A5",
-						"name": "Nineteen Eighty Four",
+						"hex": "#5F1CF2",
+						"name": "Delorean",
 						"value": "0"
 					},
 					{
-						"id": "609f7c51-172f-4a3e-9ab1-1950188713a1",
+						"id": "d1625ff1-657a-460e-bc7c-665b64a7d034",
 						"type": "scale",
-						"hex": "#FF7E27",
-						"name": "Nineteen Eighty Four",
+						"hex": "#4CE09A",
+						"name": "Delorean",
 						"value": "0"
 					}
 				],
@@ -2108,31 +2479,31 @@
 				"note": "",
 				"noteVisibility": "default",
 				"links": {
-					"self": "/chronograf/v1/dashboards/2/cells/23ea84a7-7fb0-4f52-8770-3ddc69036687"
+					"self": "/chronograf/v1/dashboards/3/cells/93ca21be-ea99-419d-a246-b5e6993f9639"
 				}
 			},
 			{
-				"i": "c2feab43-af40-4c5f-b4d1-8f0d9240c8b9",
-				"x": 6,
+				"i": "82089023-06cc-44f2-9f4d-0432bc64a487",
+				"x": 5,
 				"y": 0,
 				"w": 3,
 				"h": 3,
-				"name": "GDE_000",
+				"name": "Topic GDE_000 - Message Count",
 				"queries": [
 					{
-						"query": "SELECT mean(\"OneMinuteRate\") AS \"mean_OneMinuteRate\" FROM \"gde-db\".\"autogen\".\"GDE_Metrics\" WHERE time > :dashboardTime: AND time < :upperDashboardTime: AND (\"typeName\"='type=BrokerTopicMetrics,name=MessagesInPerSec,topic=GDE_000_A_gdelt_event' OR \"typeName\"='type=BrokerTopicMetrics,name=TotalProduceRequestsPerSec,topic=GDE_000_gdelt_event') GROUP BY time(:interval:) FILL(null)",
+						"query": "SELECT last(\"value\") AS \"last_value\" FROM \"gdelt\".\"autogen\".\"GDE_B010_TAB\" WHERE \"id\"='GDE_B010_ROWCOUNT' GROUP BY time(:interval:) FILL(null)",
 						"queryConfig": {
-							"database": "gde-db",
-							"measurement": "GDE_Metrics",
+							"database": "gdelt",
+							"measurement": "GDE_B010_TAB",
 							"retentionPolicy": "autogen",
 							"fields": [
 								{
-									"value": "mean",
+									"value": "last",
 									"type": "func",
-									"alias": "mean_OneMinuteRate",
+									"alias": "last_value",
 									"args": [
 										{
-											"value": "OneMinuteRate",
+											"value": "value",
 											"type": "field",
 											"alias": ""
 										}
@@ -2140,9 +2511,8 @@
 								}
 							],
 							"tags": {
-								"typeName": [
-									"type=BrokerTopicMetrics,name=MessagesInPerSec,topic=GDE_000_A_gdelt_event",
-									"type=BrokerTopicMetrics,name=TotalProduceRequestsPerSec,topic=GDE_000_gdelt_event"
+								"id": [
+									"GDE_B010_ROWCOUNT"
 								]
 							},
 							"groupBy": {
@@ -2194,28 +2564,14 @@
 						"scale": "linear"
 					}
 				},
-				"type": "line",
+				"type": "single-stat",
 				"colors": [
 					{
-						"id": "fe47c693-6bed-43a9-b530-2e332f77330b",
-						"type": "scale",
-						"hex": "#31C0F6",
-						"name": "Nineteen Eighty Four",
-						"value": "0"
-					},
-					{
-						"id": "4df500a0-2471-4a2b-852d-7dbb131574c5",
-						"type": "scale",
-						"hex": "#A500A5",
-						"name": "Nineteen Eighty Four",
-						"value": "0"
-					},
-					{
-						"id": "609f7c51-172f-4a3e-9ab1-1950188713a1",
-						"type": "scale",
-						"hex": "#FF7E27",
-						"name": "Nineteen Eighty Four",
-						"value": "0"
+						"id": "base",
+						"type": "text",
+						"hex": "#00C9FF",
+						"name": "laser",
+						"value": "-1000000000000000000"
 					}
 				],
 				"legend": {},
@@ -2239,54 +2595,36 @@
 				"timeFormat": "MM/DD/YYYY HH:mm:ss",
 				"decimalPlaces": {
 					"isEnforced": true,
-					"digits": 2
+					"digits": 0
 				},
 				"note": "",
 				"noteVisibility": "default",
 				"links": {
-					"self": "/chronograf/v1/dashboards/2/cells/c2feab43-af40-4c5f-b4d1-8f0d9240c8b9"
+					"self": "/chronograf/v1/dashboards/3/cells/82089023-06cc-44f2-9f4d-0432bc64a487"
 				}
 			},
 			{
-				"i": "d6e770df-1eea-4e9b-95c1-5e6ca220af1c",
+				"i": "ec2f2fb4-4514-4a3a-a7cb-c9fac388937e",
 				"x": 0,
 				"y": 0,
 				"w": 3,
 				"h": 3,
-				"name": "Postgres",
+				"name": "K/Connect JDBC Source - Total Records",
 				"queries": [
 					{
-						"query": "SELECT mean(\"source-record-write-total\") AS \"mean_source-record-write-total\" FROM \"db-connect\".\"autogen\".\"connect-source\" WHERE time > :dashboardTime: AND time < :upperDashboardTime: AND \"typeName\"='type=source-task-metrics,connector=SOURCE_JDBC_GDELT_EVENT,task=0' GROUP BY time(:interval:) FILL(null)",
+						"query": "SELECT last(\"source-record-write-total\") AS \"mean_source-record-write-total\" FROM \"db-connect\".\"autogen\".\"connect-source\" WHERE time > :dashboardTime: AND time < :upperDashboardTime: AND \"typeName\"='type=source-task-metrics,connector=SOURCE_JDBC_GDELT_EVENT,task=0' and \"source-record-write-total\">0 GROUP BY time(:interval:) FILL(null)",
 						"queryConfig": {
-							"database": "db-connect",
-							"measurement": "connect-source",
-							"retentionPolicy": "autogen",
-							"fields": [
-								{
-									"value": "mean",
-									"type": "func",
-									"alias": "mean_source-record-write-total",
-									"args": [
-										{
-											"value": "source-record-write-total",
-											"type": "field",
-											"alias": ""
-										}
-									]
-								}
-							],
-							"tags": {
-								"typeName": [
-									"type=source-task-metrics,connector=SOURCE_JDBC_GDELT_EVENT,task=0"
-								]
-							},
+							"database": "",
+							"measurement": "",
+							"retentionPolicy": "",
+							"fields": [],
+							"tags": {},
 							"groupBy": {
-								"time": "auto",
+								"time": "",
 								"tags": []
 							},
-							"areTagsAccepted": true,
-							"fill": "null",
-							"rawText": null,
+							"areTagsAccepted": false,
+							"rawText": "SELECT last(\"source-record-write-total\") AS \"mean_source-record-write-total\" FROM \"db-connect\".\"autogen\".\"connect-source\" WHERE time > :dashboardTime: AND time < :upperDashboardTime: AND \"typeName\"='type=source-task-metrics,connector=SOURCE_JDBC_GDELT_EVENT,task=0' and \"source-record-write-total\">0 GROUP BY time(:interval:) FILL(null)",
 							"range": null,
 							"shifts": null
 						},
@@ -2329,10 +2667,10 @@
 						"scale": "linear"
 					}
 				},
-				"type": "line",
+				"type": "line-plus-single-stat",
 				"colors": [
 					{
-						"id": "fe47c693-6bed-43a9-b530-2e332f77330b",
+						"id": "base",
 						"type": "scale",
 						"hex": "#31C0F6",
 						"name": "Nineteen Eighty Four",
@@ -2374,12 +2712,142 @@
 				"timeFormat": "MM/DD/YYYY HH:mm:ss",
 				"decimalPlaces": {
 					"isEnforced": true,
-					"digits": 2
+					"digits": 0
 				},
 				"note": "",
 				"noteVisibility": "default",
 				"links": {
-					"self": "/chronograf/v1/dashboards/2/cells/d6e770df-1eea-4e9b-95c1-5e6ca220af1c"
+					"self": "/chronograf/v1/dashboards/3/cells/ec2f2fb4-4514-4a3a-a7cb-c9fac388937e"
+				}
+			},
+			{
+				"i": "78ecf862-208a-4abe-a6d7-82a154ca6557",
+				"x": 9,
+				"y": 5,
+				"w": 1,
+				"h": 1,
+				"name": "IND",
+				"queries": [
+					{
+						"query": "SELECT sum(\"value\") AS \"v_value\" FROM \"gdelt\".\"autogen\".\"GDE_D040_STR\" WHERE time > now() - 1m AND (\"id\"='IND' OR \"id\"='India') GROUP BY time(:interval:) FILL(null)",
+						"queryConfig": {
+							"database": "gdelt",
+							"measurement": "GDE_D040_STR",
+							"retentionPolicy": "autogen",
+							"fields": [
+								{
+									"value": "sum",
+									"type": "func",
+									"alias": "v_value",
+									"args": [
+										{
+											"value": "value",
+											"type": "field",
+											"alias": ""
+										}
+									]
+								}
+							],
+							"tags": {
+								"id": [
+									"IND",
+									"India"
+								]
+							},
+							"groupBy": {
+								"time": "auto",
+								"tags": []
+							},
+							"areTagsAccepted": true,
+							"fill": "null",
+							"rawText": null,
+							"range": {
+								"upper": "",
+								"lower": "now() - 1m"
+							},
+							"shifts": null
+						},
+						"source": "",
+						"type": "influxql"
+					}
+				],
+				"axes": {
+					"x": {
+						"bounds": [
+							"",
+							""
+						],
+						"label": "",
+						"prefix": "",
+						"suffix": "",
+						"base": "10",
+						"scale": "linear"
+					},
+					"y": {
+						"bounds": [
+							"",
+							""
+						],
+						"label": "",
+						"prefix": "",
+						"suffix": "",
+						"base": "10",
+						"scale": "linear"
+					},
+					"y2": {
+						"bounds": [
+							"",
+							""
+						],
+						"label": "",
+						"prefix": "",
+						"suffix": "",
+						"base": "10",
+						"scale": "linear"
+					}
+				},
+				"type": "single-stat",
+				"colors": [
+					{
+						"id": "base",
+						"type": "text",
+						"hex": "#00C9FF",
+						"name": "laser",
+						"value": "-1000000000000000000"
+					}
+				],
+				"legend": {},
+				"tableOptions": {
+					"verticalTimeAxis": true,
+					"sortBy": {
+						"internalName": "time",
+						"displayName": "",
+						"visible": true
+					},
+					"wrapping": "truncate",
+					"fixFirstColumn": true
+				},
+				"fieldOptions": [
+					{
+						"internalName": "time",
+						"displayName": "",
+						"visible": true
+					},
+					{
+						"internalName": "GDE_D040_STR.v_value",
+						"displayName": "USA",
+						"visible": true
+					}
+				],
+				"timeFormat": "MM/DD/YYYY HH:mm:ss",
+				"decimalPlaces": {
+					"isEnforced": true,
+					"digits": 0
+				},
+				"note": "USA\t",
+				"noteVisibility": "default",
+				"links": {
+					"self": "/chronograf/v1/dashboards/3/cells/78ecf862-208a-4abe-a6d7-82a154ca6557"
 				}
 			}
 		],
@@ -2387,9 +2855,9 @@
 		"name": "GDE2",
 		"organization": "default",
 		"links": {
-			"self": "/chronograf/v1/dashboards/2",
-			"cells": "/chronograf/v1/dashboards/2/cells",
-			"templates": "/chronograf/v1/dashboards/2/templates"
+			"self": "/chronograf/v1/dashboards/3",
+			"cells": "/chronograf/v1/dashboards/3/cells",
+			"templates": "/chronograf/v1/dashboards/3/templates"
 		}
 	}
 }
