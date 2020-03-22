@@ -268,7 +268,7 @@
 				"name": "data-GDE",
 				"queries": [
 					{
-						"query": "SELECT count(\"*\") AS \"rowcount\" FROM \"gdelt\".\"autogen\".\"GDE_D040_STR\" WHERE time > :dashboardTime: AND time < :upperDashboardTime: GROUP BY time(:interval:) FILL(null)",
+						"query": "SELECT count(*) AS \"rowcount\" FROM \"gdelt\".\"autogen\".\"GDE_D040_STR\" WHERE time > :dashboardTime: AND time < :upperDashboardTime: GROUP BY time(:interval:) FILL(null)",
 						"queryConfig": {
 							"database": "gdelt",
 							"measurement": "GDE_D040_STR",
@@ -281,7 +281,7 @@
 									"args": [
 										{
 											"value": "*",
-											"type": "field",
+											"type": "wildcard",
 											"alias": ""
 										}
 									]
@@ -342,8 +342,8 @@
 					{
 						"id": "base",
 						"type": "text",
-						"hex": "#7CE490",
-						"name": "honeydew",
+						"hex": "#F95F53",
+						"name": "curacao",
 						"value": "-1000000000000000000"
 					},
 					{
@@ -516,20 +516,20 @@
 				"name": "JPN",
 				"queries": [
 					{
-						"query": "SELECT sum(\"value\") AS \"v_value\" FROM \"gdelt\".\"autogen\".\"GDE_D040_STR\" WHERE time > now() - 1m AND (\"id\"='JPN' OR \"id\"='Japan') GROUP BY time(:interval:) FILL(null)",
+						"query": "SELECT count(*) as \"v_value\" FROM \"gdelt\".\"autogen\".\"GDE_D040_STR\" WHERE  \"id\"='Japan' ",
 						"queryConfig": {
 							"database": "gdelt",
 							"measurement": "GDE_D040_STR",
 							"retentionPolicy": "autogen",
 							"fields": [
 								{
-									"value": "sum",
+									"value": "count",
 									"type": "func",
 									"alias": "v_value",
 									"args": [
 										{
-											"value": "value",
-											"type": "field",
+											"value": "*",
+											"type": "wildcard",
 											"alias": ""
 										}
 									]
@@ -537,21 +537,16 @@
 							],
 							"tags": {
 								"id": [
-									"JPN",
 									"Japan"
 								]
 							},
 							"groupBy": {
-								"time": "auto",
+								"time": "",
 								"tags": []
 							},
 							"areTagsAccepted": true,
-							"fill": "null",
 							"rawText": null,
-							"range": {
-								"upper": "",
-								"lower": "now() - 1m"
-							},
+							"range": null,
 							"shifts": null
 						},
 						"source": "",
@@ -646,20 +641,20 @@
 				"name": "FRA",
 				"queries": [
 					{
-						"query": "SELECT sum(\"value\") AS \"v_value\" FROM \"gdelt\".\"autogen\".\"GDE_D040_STR\" WHERE time < :upperDashboardTime: AND \"id\"='FRA' GROUP BY time(:interval:) FILL(null)",
+						"query": "SELECT count(*) as \"v_value\" FROM \"gdelt\".\"autogen\".\"GDE_D040_STR\" WHERE  \"id\"='France' ",
 						"queryConfig": {
 							"database": "gdelt",
 							"measurement": "GDE_D040_STR",
 							"retentionPolicy": "autogen",
 							"fields": [
 								{
-									"value": "sum",
+									"value": "count",
 									"type": "func",
 									"alias": "v_value",
 									"args": [
 										{
-											"value": "value",
-											"type": "field",
+											"value": "*",
+											"type": "wildcard",
 											"alias": ""
 										}
 									]
@@ -667,20 +662,16 @@
 							],
 							"tags": {
 								"id": [
-									"FRA"
+									"France"
 								]
 							},
 							"groupBy": {
-								"time": "auto",
+								"time": "",
 								"tags": []
 							},
 							"areTagsAccepted": true,
-							"fill": "null",
 							"rawText": null,
-							"range": {
-								"upper": "",
-								"lower": "now() - 1m"
-							},
+							"range": null,
 							"shifts": null
 						},
 						"source": "",
@@ -775,20 +766,20 @@
 				"name": "AUS",
 				"queries": [
 					{
-						"query": "SELECT sum(\"value\") AS \"v_value\" FROM \"gdelt\".\"autogen\".\"GDE_D040_STR\" WHERE time > now() - 1m AND (\"id\"='AUS' OR \"id\"='Australia') GROUP BY time(:interval:) FILL(null)",
+						"query": "SELECT count(*) as \"v_value\" FROM \"gdelt\".\"autogen\".\"GDE_D040_STR\" WHERE  \"id\"='Australia' ",
 						"queryConfig": {
 							"database": "gdelt",
 							"measurement": "GDE_D040_STR",
 							"retentionPolicy": "autogen",
 							"fields": [
 								{
-									"value": "sum",
+									"value": "count",
 									"type": "func",
 									"alias": "v_value",
 									"args": [
 										{
-											"value": "value",
-											"type": "field",
+											"value": "*",
+											"type": "wildcard",
 											"alias": ""
 										}
 									]
@@ -796,21 +787,16 @@
 							],
 							"tags": {
 								"id": [
-									"AUS",
 									"Australia"
 								]
 							},
 							"groupBy": {
-								"time": "auto",
+								"time": "",
 								"tags": []
 							},
 							"areTagsAccepted": true,
-							"fill": "null",
 							"rawText": null,
-							"range": {
-								"upper": "",
-								"lower": "now() - 1m"
-							},
+							"range": null,
 							"shifts": null
 						},
 						"source": "",
@@ -905,20 +891,20 @@
 				"name": "ITA",
 				"queries": [
 					{
-						"query": "SELECT sum(\"value\") AS \"v_value\" FROM \"gdelt\".\"autogen\".\"GDE_D040_STR\" WHERE time > now() - 1m AND (\"id\"='ITA' OR \"id\"='Italy') GROUP BY time(:interval:) FILL(null)",
+						"query": "SELECT count(*) as \"v_value\" FROM \"gdelt\".\"autogen\".\"GDE_D040_STR\" WHERE  \"id\"='Italy' ",
 						"queryConfig": {
 							"database": "gdelt",
 							"measurement": "GDE_D040_STR",
 							"retentionPolicy": "autogen",
 							"fields": [
 								{
-									"value": "sum",
+									"value": "count",
 									"type": "func",
 									"alias": "v_value",
 									"args": [
 										{
-											"value": "value",
-											"type": "field",
+											"value": "*",
+											"type": "wildcard",
 											"alias": ""
 										}
 									]
@@ -926,21 +912,16 @@
 							],
 							"tags": {
 								"id": [
-									"ITA",
 									"Italy"
 								]
 							},
 							"groupBy": {
-								"time": "auto",
+								"time": "",
 								"tags": []
 							},
 							"areTagsAccepted": true,
-							"fill": "null",
 							"rawText": null,
-							"range": {
-								"upper": "",
-								"lower": "now() - 1m"
-							},
+							"range": null,
 							"shifts": null
 						},
 						"source": "",
@@ -1035,20 +1016,20 @@
 				"name": "THA",
 				"queries": [
 					{
-						"query": "SELECT sum(\"value\") AS \"v_value\" FROM \"gdelt\".\"autogen\".\"GDE_D040_STR\" WHERE time < :upperDashboardTime: AND \"id\"='THA' GROUP BY time(:interval:) FILL(null)",
+						"query": "SELECT count(*) as \"v_value\" FROM \"gdelt\".\"autogen\".\"GDE_D040_STR\" WHERE \"id\"='Thailand' GROUP BY time(:interval:) FILL(null)",
 						"queryConfig": {
 							"database": "gdelt",
 							"measurement": "GDE_D040_STR",
 							"retentionPolicy": "autogen",
 							"fields": [
 								{
-									"value": "sum",
+									"value": "count",
 									"type": "func",
 									"alias": "v_value",
 									"args": [
 										{
-											"value": "value",
-											"type": "field",
+											"value": "*",
+											"type": "wildcard",
 											"alias": ""
 										}
 									]
@@ -1056,7 +1037,7 @@
 							],
 							"tags": {
 								"id": [
-									"THA"
+									"Thailand"
 								]
 							},
 							"groupBy": {
@@ -1066,10 +1047,7 @@
 							"areTagsAccepted": true,
 							"fill": "null",
 							"rawText": null,
-							"range": {
-								"upper": "",
-								"lower": "now() - 1m"
-							},
+							"range": null,
 							"shifts": null
 						},
 						"source": "",
@@ -1164,20 +1142,20 @@
 				"name": "CHN",
 				"queries": [
 					{
-						"query": "SELECT sum(\"value\") AS \"v_value\" FROM \"gdelt\".\"autogen\".\"GDE_D040_STR\" WHERE time > now() - 1m AND (\"id\"='CHN' OR \"id\"='China') GROUP BY time(:interval:) FILL(null)",
+						"query": "SELECT count(*) as v_value FROM \"gdelt\".\"autogen\".\"GDE_D040_STR\" WHERE (\"id\"='CHN' OR \"id\"='China') GROUP BY time(:interval:) FILL(null)",
 						"queryConfig": {
 							"database": "gdelt",
 							"measurement": "GDE_D040_STR",
 							"retentionPolicy": "autogen",
 							"fields": [
 								{
-									"value": "sum",
+									"value": "count",
 									"type": "func",
 									"alias": "v_value",
 									"args": [
 										{
-											"value": "value",
-											"type": "field",
+											"value": "*",
+											"type": "wildcard",
 											"alias": ""
 										}
 									]
@@ -1196,10 +1174,7 @@
 							"areTagsAccepted": true,
 							"fill": "null",
 							"rawText": null,
-							"range": {
-								"upper": "",
-								"lower": "now() - 1m"
-							},
+							"range": null,
 							"shifts": null
 						},
 						"source": "",
@@ -1294,20 +1269,20 @@
 				"name": "IRL",
 				"queries": [
 					{
-						"query": "SELECT mean(\"value\") AS \"mean_value\" FROM \"gdelt\".\"autogen\".\"GDE_D040_STR\" WHERE time > now() - 1m AND (\"id\"='IRL' OR \"id\"='Ireland') GROUP BY time(:interval:) FILL(null)",
+						"query": "SELECT count(*) as cc FROM \"gdelt\".\"autogen\".\"GDE_D040_STR\" WHERE \"id\"='Ireland' GROUP BY time(:interval:) FILL(null)",
 						"queryConfig": {
 							"database": "gdelt",
 							"measurement": "GDE_D040_STR",
 							"retentionPolicy": "autogen",
 							"fields": [
 								{
-									"value": "mean",
+									"value": "count",
 									"type": "func",
-									"alias": "mean_value",
+									"alias": "cc",
 									"args": [
 										{
-											"value": "value",
-											"type": "field",
+											"value": "*",
+											"type": "wildcard",
 											"alias": ""
 										}
 									]
@@ -1315,7 +1290,6 @@
 							],
 							"tags": {
 								"id": [
-									"IRL",
 									"Ireland"
 								]
 							},
@@ -1326,10 +1300,7 @@
 							"areTagsAccepted": true,
 							"fill": "null",
 							"rawText": null,
-							"range": {
-								"upper": "",
-								"lower": "now() - 1m"
-							},
+							"range": null,
 							"shifts": null
 						},
 						"source": "",
@@ -1424,20 +1395,20 @@
 				"name": "GBR",
 				"queries": [
 					{
-						"query": "SELECT sum(\"value\") AS \"v_value\" FROM \"gdelt\".\"autogen\".\"GDE_D040_STR\" WHERE time > now() - 1m AND (\"id\"='GBR' OR \"id\"='United Kingdom') GROUP BY time(:interval:) FILL(null)",
+						"query": "SELECT count(*) AS \"v_value\" FROM \"gdelt\".\"autogen\".\"GDE_D040_STR\" WHERE \"id\"='United Kingdom' GROUP BY time(:interval:) FILL(null)",
 						"queryConfig": {
 							"database": "gdelt",
 							"measurement": "GDE_D040_STR",
 							"retentionPolicy": "autogen",
 							"fields": [
 								{
-									"value": "sum",
+									"value": "count",
 									"type": "func",
 									"alias": "v_value",
 									"args": [
 										{
-											"value": "value",
-											"type": "field",
+											"value": "*",
+											"type": "wildcard",
 											"alias": ""
 										}
 									]
@@ -1445,7 +1416,6 @@
 							],
 							"tags": {
 								"id": [
-									"GBR",
 									"United Kingdom"
 								]
 							},
@@ -1456,10 +1426,7 @@
 							"areTagsAccepted": true,
 							"fill": "null",
 							"rawText": null,
-							"range": {
-								"upper": "",
-								"lower": "now() - 1m"
-							},
+							"range": null,
 							"shifts": null
 						},
 						"source": "",
@@ -1554,20 +1521,20 @@
 				"name": "USA",
 				"queries": [
 					{
-						"query": "SELECT sum(\"value\") AS \"v_value\" FROM \"gdelt\".\"autogen\".\"GDE_D040_STR\" WHERE time > now() - 1m AND (\"id\"='USA' OR \"id\"='United States') GROUP BY time(:interval:) FILL(null)",
+						"query": "SELECT count(*) AS \"v_value\" FROM \"gdelt\".\"autogen\".\"GDE_D040_STR\" WHERE \"id\"='United States' GROUP BY time(:interval:) FILL(null)",
 						"queryConfig": {
 							"database": "gdelt",
 							"measurement": "GDE_D040_STR",
 							"retentionPolicy": "autogen",
 							"fields": [
 								{
-									"value": "sum",
+									"value": "count",
 									"type": "func",
 									"alias": "v_value",
 									"args": [
 										{
-											"value": "value",
-											"type": "field",
+											"value": "*",
+											"type": "wildcard",
 											"alias": ""
 										}
 									]
@@ -1575,7 +1542,6 @@
 							],
 							"tags": {
 								"id": [
-									"USA",
 									"United States"
 								]
 							},
@@ -1586,10 +1552,7 @@
 							"areTagsAccepted": true,
 							"fill": "null",
 							"rawText": null,
-							"range": {
-								"upper": "",
-								"lower": "now() - 1m"
-							},
+							"range": null,
 							"shifts": null
 						},
 						"source": "",
@@ -2729,20 +2692,20 @@
 				"name": "IND",
 				"queries": [
 					{
-						"query": "SELECT sum(\"value\") AS \"v_value\" FROM \"gdelt\".\"autogen\".\"GDE_D040_STR\" WHERE time > now() - 1m AND (\"id\"='IND' OR \"id\"='India') GROUP BY time(:interval:) FILL(null)",
+						"query": "SELECT count(*) as \"v_value\" FROM \"gdelt\".\"autogen\".\"GDE_D040_STR\" WHERE  \"id\"='India' ",
 						"queryConfig": {
 							"database": "gdelt",
 							"measurement": "GDE_D040_STR",
 							"retentionPolicy": "autogen",
 							"fields": [
 								{
-									"value": "sum",
+									"value": "count",
 									"type": "func",
 									"alias": "v_value",
 									"args": [
 										{
-											"value": "value",
-											"type": "field",
+											"value": "*",
+											"type": "wildcard",
 											"alias": ""
 										}
 									]
@@ -2750,21 +2713,16 @@
 							],
 							"tags": {
 								"id": [
-									"IND",
 									"India"
 								]
 							},
 							"groupBy": {
-								"time": "auto",
+								"time": "",
 								"tags": []
 							},
 							"areTagsAccepted": true,
-							"fill": "null",
 							"rawText": null,
-							"range": {
-								"upper": "",
-								"lower": "now() - 1m"
-							},
+							"range": null,
 							"shifts": null
 						},
 						"source": "",
