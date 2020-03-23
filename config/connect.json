@@ -1,0 +1,26 @@
+{
+  "servers": [
+    {
+      "port": "3001",
+      "host": "kafka-connect-01",
+      "alias": "kafka-connect",
+      "queries": [
+        {
+          "outputWriters": [
+            {
+              "@class": "com.googlecode.jmxtrans.model.output.InfluxDbWriterFactory",
+              "url": "http://influxdb:8086",
+              "database": "db-connect",
+              "username": "root",
+              "password": "root"
+            }
+          ],
+          "obj": "kafka.connect:type=source-task-metrics,connector=*,task=*",
+          "attr": [ "source-record-write-total", "source-record-write-rate" ],
+          "resultAlias": "connect-source"
+        }
+      ],
+      "numQueryThreads": 2
+    }
+  ]
+}
