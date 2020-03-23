@@ -31,8 +31,57 @@ Login to Chronograf using the URL below:
 * The default username/password is admin/admin
 * Create a Data Source for influxdb. URL=influxdb:8086, username=root, password=root, database=influxdb.
 * Import dashboard ksqlapp.json. No data is visible yet.
+```
 
-Run the setup scripts
+
+
+To run the demo:
+1. Clone or download the repo, unpack and cd to the directory. Start the docker daemon with 8GB RAM.
+Add this line to your /etc/hosts:
+```
+127.0.0.1 localhost ksqldb-server kafka1
+```
+
+2. Stand up the docker-compose. This takes approx ten minutes to pull and start all images.
+```
+docker-compose -p ksqdb-jmx-monitoring-master up
+```
+
+3. In a second terminal window, verify that all containers are in status "up"
+If not, then run docker-compose start <containerName> to restart any stopped containers
+```
+$ docker-compose -p ksqdb-jmx-monitoring-master ps
+      Name                    Command                  State                           Ports                     
+-----------------------------------------------------------------------------------------------------------------
+Postgres           docker-entrypoint.sh postgres    Up             5432/tcp                                      
+chronograf         /entrypoint.sh chronograf        Up             0.0.0.0:8888->8888/tcp                        
+control-center     /etc/confluent/docker/run        Up             0.0.0.0:9021->9021/tcp                        
+influxdb           /entrypoint.sh influxd           Up             8083/tcp, 0.0.0.0:8086->8086/tcp              
+jmx-connect        /docker-entrypoint.sh star ...   Up             9999/tcp                                      
+jmx-gde            /docker-entrypoint.sh star ...   Up             9999/tcp                                      
+jmx-kafka          /docker-entrypoint.sh star ...   Up             9999/tcp                                      
+kafka-connect-01   bash -c echo "Installing C ...   Up (healthy)   0.0.0.0:8083->8083/tcp, 9092/tcp              
+kafka1             /etc/confluent/docker/run        Up             0.0.0.0:3001->3001/tcp, 0.0.0.0:9092->9092/tcp
+ksqldb-cli         /bin/sh                          Up                                                           
+ksqldb-gde         /usr/bin/docker/run              Up             0.0.0.0:8088->8088/tcp                        
+schema-registry    /etc/confluent/docker/run        Up             0.0.0.0:8081->8081/tcp                        
+zookeeper          /etc/confluent/docker/run        Up             2181/tcp, 2888/tcp, 3888/tcp                  	
+```
+
+4. Open http://localhost:9021 to verify that Confluent Control Center is running. Check these:
+a. on the Launch page, check that Controller=Y, kSQLDB clusters=1 and Connect clusters=1
+b. Under Topics, the only topics should be a,b,c,
+c. Under kSQL | Clusters ...
+d. Under Connect | Clusters ...
+
+
+5. The containers are initialized and ready. Run "runme" to create all objects.
+You can run the script headless (default) or interactively by editing the Pause function.
+By default it will "sleep" between commands, without any error checks.
+To change it to interactive
+
+
+
 ./runme This will execute the steps in sequence with Pauses so that you can observe
 It does the following:
 * truncate/drop/create the gdelt_event table in postgres
