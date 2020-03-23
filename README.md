@@ -6,27 +6,24 @@ JMX metrics, like kittens, require an element of mustering.
 kSQLDB and Chronograf, paired with jmxtrans and Kafka offer a pipeline toolkit to capture, filter and depict JMX metrics at scale. 
 JMXTrans sends all JVM metrics to an influxDB database. A Kafka broker has ~150 built in metrics; which can quite easily exceed the data throughput of messages for smaller kafka clusters. So with whiteisting and filtering for nominated JMX metrics types, JMX pipelines can be built to feed a dashboard with a specific, defined role.
 
-One beneficiary of this is topic-level monitoring of streaming pipelines; where message produce metrics at the topic level can be used to determine the health of a stream processing application.
-This topology offers other benefits:
-* ship all JMX metrics into a kafka topic using jmxtrans wildcards; for all classes, objects and topic names.
-* This requires regular jmxtrans container restarts to pick up new topics
-* Use the native jmxtrans Kafka producer to stream JSON messages for wildcarded metric definitions, for each JVM server
-* Create filter streams using kSQLDB to reduce the message pipelines to logical units: such as metrics for a stream processing applications. Largely using CASE and SUBSTR() predicates
-* Use a kSQLDB Sink Connector to stream kSQLDB metric streams to influxDB measurements, and onwards to Chronograf
-* See "runme" for the complete pipeline; including "GDE" - a news-story processing streaming application.
+One possible use of a filtered JMX dashboard is topic-level monitoring of streaming pipelines; where message produce metrics at the topic level can be used to determine the health of a stream processing application.
+
+This demo uses a public dataset GDELT. The data endpoint publishes a CSV file every fifteen minutes with one CSV line for a news story that was published online, during the last 15 minutes. The file does not contain the news story itsef; rather it contains metadata about the new story: such as the URL, various categorizations (type, country, etc), lat/long of the principal actors, an AI estimation of the tone of the story, among others. In total each line contains a total of 61 attributes for each story. There are typically 3000-10000 stories records every fifteen minutes; millions per day; and billions downloadable as CSVs online.
 
 ![ KSQL Topology ](images/topology.png)
 
 
 ```
 It consists of:
-docker-compose.yml - docker compose yaml for all containers
-             runme - a shell script to initialize all objects, load data and create the streaming pipeline
-           getNews - a shell script to pull more test data from data.gdeltproject.org
-          loadNews - a shell script to load bundled test data from data/gdelt (102 files; 186,189 news stories)
- config/kafka.json - a jmxtrans config file to extract nominated jmx metrics and push to a kafka topic JMX
-      ksqlapp.json - a Chronograf dashboard (not integrated with the current release)
-              data - data subdirectories for postgres, influx and Chronograf
+   docker-compose.yml - docker compose yaml for all containers
+                runme - a shell script to initialize all objects, load data and create the streaming pipeline
+              getNews - a shell script to pull more test data from data.gdeltproject.org
+  config/connect.json - a jmxtrans config file to extract nominated jmx metrics from Kafka Connect
+      config/gde.json - a jmxtrans config file to extract topic producer metrics from nominated topics in teh streaming app
+    config/kafka.json - a jmxtrans config file to extract nominated jmx metrics from Kafka brokers (not used yet)
+ config/countries.sql - an init file used to populate a countries table in postgres
+         ksqlapp.json - a Chronograf dashboard (not integrated with the current release)
+                 data - persistent data subdirectories for postgres, influx and Chronograf
 Instructions:
 Clone/download the repo
 docker-compose up
