@@ -4,7 +4,7 @@ This repo demonstrates monitoring a kSQL pipeline using a Chronograf dashboard.
 JMX metrics, like kittens, require an element of mustering.
 
 kSQLDB and Chronograf, paired with jmxtrans and Kafka offer a pipeline toolkit to capture, filter and depict JMX metrics at scale. 
-JMXTrans sends all JVM metrics to a kafka topic where kSQLDB filters, transforms and sinks whats needed to influxdb.
+JMXTrans sends all JVM metrics to an influxDB database. A Kafka broker has ~150 built in metrics; which can quite easily exceed the data throughput of messages for smaller kafka clusters. So with whiteisting and filtering for nominated JMX metrics types, JMX pipelines can be built to feed a dashboard with a specific, defined role.
 
 One beneficiary of this is topic-level monitoring of streaming pipelines; where message produce metrics at the topic level can be used to determine the health of a stream processing application.
 This topology offers other benefits:
