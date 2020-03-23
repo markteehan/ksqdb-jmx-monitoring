@@ -42,6 +42,11 @@ Add this line to your /etc/hosts:
 127.0.0.1 localhost ksqldb-server kafka1
 ```
 
+Set the docker-comose project name
+```
+export COMPOSE_PROJECT_NAME=ksqdb-jmx-monitoring-master
+```
+
 2. Stand up the docker-compose. This takes approx ten minutes to pull and start all images.
 ```
 docker-compose -p ksqdb-jmx-monitoring-master up
@@ -69,8 +74,9 @@ zookeeper          /etc/confluent/docker/run        Up             2181/tcp, 288
 ```
 
 4. Open http://localhost:9021 to verify that Confluent Control Center is running. 
-![Confluent Control Center Cluster Summary](images/c3_box.png)
 
+![Confluent Control Center Cluster Summary](images/c3_box.png)
+```
 Check these:
 a. on the Launch page, check verify: "Healthy Clusters"=1, "KSQL CLusters"=1 and "Connect Clusters"=1
 b. Under CO Cluster 1 | Topics, check for a total of four topics; for Kafka Connect and kSQL processing
@@ -79,12 +85,23 @@ d. Under Connect | Cluster Name="cdc" each of the four columns should show a val
 
 If you see different values, then some containers may not have started (so start them manually)
 Or, if you are reusing containers, then see the steps to initialize containers below.
+```
+
+5. Open http://localhost:8888 to check if Chronograf is running.
+
+6. The containers are initialized and ready. The "runme" script executes all steps to build objects for the demo.
+
+Run runme with "--interactive" to run the demo interactively. Wait at least five seconds between pressing <return> to ensure that kSQLDB streams and tables have been created before running the next step.
+```
+./runme --interactive
+```
+
+To run it without any prompts, just run it without any argument:
+```
+./runme
+```
 
 
-5. The containers are initialized and ready. Run "runme" to create all objects.
-You can run the script headless (default) or interactively by editing the Pause function.
-By default it will "sleep" between commands, without any error checks.
-To change it to interactive
 
 
 
