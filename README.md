@@ -90,7 +90,6 @@ Or, if you are reusing containers, then see the steps to initialize containers b
 5. Open http://localhost:8888 to check if Chronograf is running.
 
 6. The containers are initialized and ready. The "runme" script executes all steps to build objects for the demo.
-
 Run runme with "--interactive" to run the demo interactively. Wait at least five seconds between pressing <return> to ensure that kSQLDB streams and tables have been created before running the next step.
 ```
 ./runme --interactive
@@ -101,7 +100,25 @@ To run it without any prompts, just run it without any argument:
 ./runme
 ```
 
+Press <return> when prompted, or wait for completion.
+The last prompt should be :
+```
+Loading  data/gdelt/20191205000000.export.csv into Postgres ...
+COPY 4356
+ count 
+-------
+  6559
+(1 row)
 
+Finished!
+Run getNews to load up yesterdays news
+```
+
+7. Check that the kSQLDB data pipeline is running by checking the KSQL status page in Confluent Control Center
+![kSQL status](images/ksql-running.png)
+
+Similarly, Kafka Connect jobs should all be running:
+![Connect status](images/connect-running.png)
 
 
 
