@@ -137,33 +137,23 @@ In the left sidebar, select "Dashboards" | Import Dashboard and drop the file "c
 Click Continue
 For "Reconcile Sources" click "Done" without making any changes.
 You should see "Dashboard Imported Successfully".
-Click on dashboard "GDE2"
+Click on dashboard "GDE2". 
+Press the upper-right Dashboard icon to view the dashboard in presentation mode.
 You should see this:
 ```
 ![Chronograf Dashboard Initial State](images/chronograf-init.png)
 
+9. run "getNews" to load Yesterdays News - this will download, unpack and load new stories for YYYYMMDD-1 of your current date. You can control-C at any time to halt loading. It requires an internet connection, and it will consume tens/hundreds of MB over several minutes.
 
-./runme This will execute the steps in sequence with Pauses so that you can observe
-It does the following:
-* truncate/drop/create the gdelt_event table in postgres
-* load 20190712181500.export.csv - 2203 rows into postgres table gdelt_event
-* in kSQLDB - create JDBC Source connector sourcepostgres_<TS>
-* CREATE SOURCE CONNECTOR source_jdbc_gdelt_event WITH ...
-* CREATE SOURCE CONNECTOR source_jdbc_countries WITH ...
-* CREATE STREAM GDE_A010_STR WITH (kafka_topic='GDE_000_gdelt_event', value_format='avro',partitions=1);
-* CREATE TABLE GDE_B020_TAB AS SELECT cast(count(*) as bigint) as C_COUNT FROM GDE_A010_STR GROUP BY 0;
-* CREATE STREAM GDE_A020_STR AS SELECT * FROM GDE_A010_STR PARTITION BY ACTOR1COUNTRYCODE;
-* CREATE STREAM GDE_C010_STR AS SELECT * FROM GDE_000_COUNTRIES PARTITION BY ISO3;
-* CREATE STREAM GDE_D010_STR AS SELECT EVENTID ...  FROM GDE_A020_STR JOIN GDE_C010_STR WITHIN 60 MINUTES ON (ACTOR1COUNTRYCODE=ISO3);
-* CREATE TABLE GDE_D020_TAB  AS SELECT ACTOR1_COUNTRYNAME as CTRY, cast(count(*) as bigint) as C_COUNT ... FROM GDE_D010_STR GROUP BY ACTOR1_COUNTRYNAME;
-* CREATE STREAM GDE_D030_STR AS SELECT replace(replace(replace(replace(' {"schema":{"type":"struct","fields":[{" ...  as influx_json_row FROM GDE_D020_TAB
-* CREATE SINK CONNECTOR sinkinflux_gde_${DT2} ...
+```
+./getNews
+```
+
+10. Switch back to the Chronograf dashboard to observe metrics and data streaming. 
+<<explaination of the dashboard: t.b.a.>>
 
 URLs:
 Confluent Control Center: http://localhost:9021
                  Chronograf: http://localhost:8888
 ```      
 			
- 
-
-![ Chronograf Dashboard for a kSQL App](images/screenshot.png)
