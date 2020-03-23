@@ -5,7 +5,12 @@ P_GITHUB_REPO=markteehan
 
 export DT=`date "+%Y%m%d-%H%M%S"`
 export DT2=`date "+%H%m%S"`
+export COMPOSE_PROJECT_NAME=ksqdb-jmx-monitoring-master
 
+if [ "$1" = "--interactive" ]
+then
+  INTERACTIVE=Y
+fi
 
 run()
 {
@@ -26,20 +31,37 @@ runSQL()
 
 Pause()
 {
-  echo;echo "Paused"
-  #read Pause
-  sleep 30
-  clear
-  echo;echo
+  if [ "$INTERACTIVE" = "Y" ]
+  then
+    echo;echo "Paused. Hit <return> to continue"
+    read Pause
+    clear
+    echo;echo
+  else
+    echo "Sleeping for 30 seconds before running the next cmd..."
+    sleep 30
+    echo;echo;echo;echo "=================================================================="
+  fi
+  
 }
 
 
 
-sleep 180
-clear
+if [ "$INTERACTIVE" = "Y" ]
+then
+  echo " "
+else
+  echo;echo;echo "Sleeping for 2 mins to enable all containers to start"
+  echo "After 120 seconds the remaining steps will run automatically"
+  sleep 120
+  clear
+  Pause
+fi
+
+
 echo "Check status - is everything up?"
 docker-compose up --detach
-docker-compose ps
+docker-compose ps 
 Pause
 
 echo "Initializing and restarting"
