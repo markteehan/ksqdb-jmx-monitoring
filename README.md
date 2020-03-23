@@ -120,6 +120,27 @@ Run getNews to load up yesterdays news
 Similarly, Kafka Connect jobs should all be running:
 ![Connect status](images/connect-running.png)
 
+8. Import the dashboard into Chronograf
+```
+Press "Get Started"
+Change the InfluxDB URL to "http://influxdb:8086" 
+Connection Name="Influx 1 "
+Username="root"
+Password="root"
+Click "Add Connection"
+You should see "Connected to Influx 1 successfully"
+For "Select dashboards you would like to create:", press "skip"
+For "Kapacitor Connection", press "skip"
+For "Setup Complete", press "View Connections"
+
+In the left sidebar, select "Dashboards" | Import Dashboard and drop the file "chronograf_GDE.json" into the dialog
+Click Continue
+For "Reconcile Sources" click "Done" without making any changes.
+You should see "Dashboard Imported Successfully".
+Click on dashboard "GDE2"
+You should see this:
+```
+![Chronograf Dashboard Initial State](images/chronograf-init.png)
 
 
 ./runme This will execute the steps in sequence with Pauses so that you can observe
