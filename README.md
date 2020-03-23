@@ -68,11 +68,17 @@ schema-registry    /etc/confluent/docker/run        Up             0.0.0.0:8081-
 zookeeper          /etc/confluent/docker/run        Up             2181/tcp, 2888/tcp, 3888/tcp                  	
 ```
 
-4. Open http://localhost:9021 to verify that Confluent Control Center is running. Check these:
-a. on the Launch page, check that Controller=Y, kSQLDB clusters=1 and Connect clusters=1
-b. Under Topics, the only topics should be a,b,c,
-c. Under kSQL | Clusters ...
-d. Under Connect | Clusters ...
+4. Open http://localhost:9021 to verify that Confluent Control Center is running. 
+![Confluent Control Center Cluster Summary](images/c3_box.png)
+
+Check these:
+a. on the Launch page, check verify: "Healthy Clusters"=1, "KSQL CLusters"=1 and "Connect Clusters"=1
+b. Under CO Cluster 1 | Topics, check for a total of four topics; for Kafka Connect and kSQL processing
+c. Under KSQL check that "Running Queries"=0 and "Registered Streams"=1
+d. Under Connect | Cluster Name="cdc" each of the four columns should show a value of 0
+
+If you see different values, then some containers may not have started (so start them manually)
+Or, if you are reusing containers, then see the steps to initialize containers below.
 
 
 5. The containers are initialized and ready. Run "runme" to create all objects.
