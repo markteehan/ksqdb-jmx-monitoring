@@ -11,9 +11,11 @@ One possible use of a filtered JMX dashboard is topic-level monitoring of stream
 This demo uses a public dataset GDELT. The data endpoint publishes a CSV file every fifteen minutes with one CSV line for a news story that was published online, during the last 15 minutes. The file does not contain the news story itsef; rather it contains metadata about the new story: such as the URL, various categorizations (type, country, etc), lat/long of the principal actors, an AI estimation of the tone of the story, among others. In total each line contains a total of 61 attributes for each story. There are typically 3000-10000 stories records every fifteen minutes; millions per day; and billions downloadable as CSVs online.
 
 ![ KSQL Topology ](images/topology.png)
-
+Note - this KSQL Topology is rarely 100% correct as it is refreshed infrequently.
 
 ```
+Note - this KSQL Topology is rarely 100% correct as it is refreshed infrequently.
+
 It consists of:
    docker-compose.yml - docker compose yaml for all containers
                 runme - a shell script to initialize all objects, load data and create the streaming pipeline
@@ -42,14 +44,10 @@ Add this line to your /etc/hosts:
 127.0.0.1 localhost ksqldb-server kafka1
 ```
 
-Set the docker-comose project name
-```
-export COMPOSE_PROJECT_NAME=ksqdb-jmx-monitoring-master
-```
 
 2. Stand up the docker-compose. This takes approx ten minutes to pull and start all images.
 ```
-docker-compose -p ksqdb-jmx-monitoring-master up
+docker-compose  up
 ```
 
 3. In a second terminal window, verify that all containers are in status "up"
