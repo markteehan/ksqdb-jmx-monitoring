@@ -88,13 +88,7 @@
             }
           ],
           "obj": "kafka.server:type=BrokerTopicMetrics,name=MessagesInPerSec,topic=*",
-          "attr": [
-            "Count",
-            "MeanRate",
-            "OneMinuteRate",
-            "FiveMinuteRate",
-            "FifteenMinuteRate"
-          ],
+          "attr": [ "Count", "MeanRate", "OneMinuteRate", "FiveMinuteRate", "FifteenMinuteRate" ],
           "resultAlias": "MessagesInPerSecPerTopic"
         },
         {
@@ -108,13 +102,7 @@
             }
           ],
           "obj": "kafka.server:type=BrokerTopicMetrics,name=BytesInPerSec",
-          "attr": [
-            "Count",
-            "MeanRate",
-            "OneMinuteRate",
-            "FiveMinuteRate",
-            "FifteenMinuteRate"
-          ],
+          "attr": [ "Count", "MeanRate", "OneMinuteRate", "FiveMinuteRate", "FifteenMinuteRate" ],
           "resultAlias": "BytesInPerSec"
         },
         {
@@ -128,13 +116,7 @@
             }
           ],
           "obj": "kafka.server:type=BrokerTopicMetrics,name=BytesInPerSec,topic=*",
-          "attr": [
-            "Count",
-            "MeanRate",
-            "OneMinuteRate",
-            "FiveMinuteRate",
-            "FifteenMinuteRate"
-          ],
+          "attr": [ "Count", "MeanRate", "OneMinuteRate", "FiveMinuteRate", "FifteenMinuteRate" ],
           "resultAlias": "BytesInPerSecPerTopic"
         },
         {
@@ -148,13 +130,7 @@
             }
           ],
           "obj": "kafka.server:type=BrokerTopicMetrics,name=BytesOutPerSec",
-          "attr": [
-            "Count",
-            "MeanRate",
-            "OneMinuteRate",
-            "FiveMinuteRate",
-            "FifteenMinuteRate"
-          ],
+          "attr": [ "Count", "MeanRate", "OneMinuteRate", "FiveMinuteRate", "FifteenMinuteRate" ],
           "resultAlias": "BytesOutPerSec"
         },
         {
@@ -168,13 +144,7 @@
             }
           ],
           "obj": "kafka.server:type=BrokerTopicMetrics,name=BytesOutPerSec,topic=*",
-          "attr": [
-            "Count",
-            "MeanRate",
-            "OneMinuteRate",
-            "FiveMinuteRate",
-            "FifteenMinuteRate"
-          ],
+          "attr": [ "Count", "MeanRate", "OneMinuteRate", "FiveMinuteRate", "FifteenMinuteRate" ],
           "resultAlias": "BytesOutPerSecPerTopic"
         },
         {

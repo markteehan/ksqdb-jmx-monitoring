@@ -1,0 +1,14 @@
+{
+  "servers": [
+    {
+      "port": "3001",
+      "host": "ksqldb",
+      "alias": "ksqldb",
+      "queries": [
+        { "outputWriters": [ { "@class": "com.googlecode.jmxtrans.model.output.InfluxDbWriterFactory", "url": "http://influxdb:8086", "database": "ksqldb", "username": "root", "password": "root" } ],
+          "obj": "kafka.consumer:type=consumer-fetch-manager-metrics,client-id=*", "attr": [ "records-lag-max" ], "resultAlias": "ksql-consumer"}
+      ],
+      "numQueryThreads": 2
+    }
+  ]
+}

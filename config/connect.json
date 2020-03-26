@@ -5,20 +5,10 @@
       "host": "kafka-connect-01",
       "alias": "kafka-connect",
       "queries": [
-        {
-          "outputWriters": [
-            {
-              "@class": "com.googlecode.jmxtrans.model.output.InfluxDbWriterFactory",
-              "url": "http://influxdb:8086",
-              "database": "db-connect",
-              "username": "root",
-              "password": "root"
-            }
-          ],
-          "obj": "kafka.connect:type=source-task-metrics,connector=*,task=*",
-          "attr": [ "source-record-write-total", "source-record-write-rate" ],
-          "resultAlias": "connect-source"
-        }
+        { "outputWriters": [ { "@class": "com.googlecode.jmxtrans.model.output.InfluxDbWriterFactory", "url": "http://influxdb:8086", "database": "db-connect", "username": "root", "password": "root" } ],
+          "obj": "kafka.connect:type=source-task-metrics,connector=*,task=*", "attr": [ "source-record-write-total", "source-record-write-rate" ], "resultAlias": "connect-source" }
+       ,{ "outputWriters": [ { "@class": "com.googlecode.jmxtrans.model.output.InfluxDbWriterFactory", "url": "http://influxdb:8086", "database": "db-connect", "username": "root", "password": "root" } ],
+          "obj": "kafka.consumer:type=consumer-fetch-manager-metrics,client-id=*", "attr": [ "records-lag-max" ], "resultAlias": "connect-consumer"}
       ],
       "numQueryThreads": 2
     }

@@ -48,17 +48,18 @@ services:
       SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS: PLAINTEXT://kafka1:29092
       SCHEMA_REGISTRY_CUB_KAFKA_TIMEOUT: 300
 
-  ksqldb-gde:
+  ksqldb:
     image: confluentinc/ksqldb-server:0.7.1
-    hostname: ksqldb-gde
-    container_name: ksqldb-gde
+    hostname: ksqldb
+    container_name: ksqldb
     depends_on:
       - kafka1
       - schema-registry
       - kafka-connect-01
     ports:
-      - "8088:8088"
+      - 8088:8088
     environment:
+      KSQL_JMX_OPTS: "-Djava.rmi.server.hostname=ksqldb -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.port=3001 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.rmi.port=3001" 
       KSQL_LISTENERS: http://0.0.0.0:8088
       KSQL_BOOTSTRAP_SERVERS: kafka1:29092
       KSQL_KSQL_LOGGING_PROCESSING_STREAM_AUTO_CREATE: "true"
@@ -72,7 +73,7 @@ services:
     image: confluentinc/ksqldb-cli:0.7.1
     container_name: ksqldb-cli
     depends_on:
-      - ksqldb-gde
+      - ksqldb
       - postgres
     entrypoint: /bin/sh
     tty: true
@@ -137,19 +138,19 @@ services:
       volumes:
         - ./data/postgres:/var/tmp/postgresql-data
 
-#!#  grafana:
-#!#    image: grafana/grafana:latest
-#!#    container_name: "grafana"
-#!#    links:
-#!#      - influxdb
-#!#    user: "0"
-#!#    ports:
-#!#      - "3000:3000"
-#!#    environment:
-#!#      - GF_DEFAULT_THEME=light
-#!#    volumes:
-#!#      - ./data/grafana:/var/lib/grafana
-#!#
+  grafana:
+    image: grafana/grafana:latest
+    container_name: "grafana"
+    links:
+      - influxdb
+    user: "501"
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_DEFAULT_THEME=light
+    volumes:
+      - ./data/grafana:/var/lib/grafana
+
 #!#  jmx-file:
 #!#     image: jmxtrans/jmxtrans:latest
 #!#     depends_on:
@@ -171,16 +172,16 @@ services:
      volumes:
       - ./config/gde.json:/var/lib/jmxtrans/jmx.json
  
-  jmx-kafka:
+  jmx-ksqldb:
      image: jmxtrans/jmxtrans:latest
      depends_on:
        - kafka1
-       - influxdb
-     container_name: jmx-kafka
+       - ksqldb
+     container_name: jmx-ksqldb
      environment:
        - SECONDS_BETWEEN_RUNS=3
      volumes:
-      - ./config/kafka.json:/var/lib/jmxtrans/jmx.json
+      - ./config/ksql.json:/var/lib/jmxtrans/jmx.json
 
   jmx-connect:
      image: jmxtrans/jmxtrans:latest
@@ -209,7 +210,8 @@ services:
      image: influxdb:1.1.0-alpine
      container_name: influxdb
      environment:
-      -  INFLUXDB_LOGGING_LEVEL=debug
+       - INFLUXDB_HTTP_LOG_ENABLED=false
+       - INFLUXDB_LOGGING_LEVEL=INFO
      ports:
        - 8086:8086
      volumes:
@@ -231,7 +233,7 @@ services:
       CONTROL_CENTER_SCHEMA_REGISTRY_URL: "http://schema-registry:8081"
       # The advertised URL needs to be the URL on which the browser
       #  can access the KSQL server (e.g. http://localhost:8088/info)
-      CONTROL_CENTER_KSQL_URL: "http://ksqldb-gde:8088"
+      CONTROL_CENTER_KSQL_URL: "http://ksqldb:8088"
       CONTROL_CENTER_KSQL_ADVERTISED_URL: "http://localhost:8088"
       # -v-v-v-v-v-v-v-v-v-v-v-v-v-v-v-v-v-v-v-v-v-v-v-v-v-v-v-v-v-v-v-v-v-v-v
       # Useful settings for development/laptop use - modify as needed for Prod

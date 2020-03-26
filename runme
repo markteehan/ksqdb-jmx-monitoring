@@ -5,7 +5,6 @@ P_GITHUB_REPO=markteehan
 
 export DT=`date "+%Y%m%d-%H%M%S"`
 export DT2=`date "+%H%m%S"`
-export COMPOSE_PROJECT_NAME=ksqdb-jmx-monitoring-master
 
 if [ "$1" = "--interactive" ]
 then
@@ -24,7 +23,7 @@ runSQL()
   echo "set 'auto.offset.reset'='earliest'; " > /tmp/cmda.sql
   cat /tmp/cmda.sql /tmp/cmd.sql > /tmp/cmdb.sql
   docker cp /tmp/cmdb.sql ksqldb-cli:/tmp/cmd.sql
-  docker exec -it ksqldb-cli bash -c "ksql http://ksqldb-gde:8088 < /tmp/cmd.sql"
+  docker exec -it ksqldb-cli bash -c "ksql http://ksqldb:8088 < /tmp/cmd.sql"
   Pause
 }
 
@@ -61,32 +60,37 @@ fi
 
 echo "Check status - is everything up?"
 docker-compose up --detach
-docker-compose ps 
+docker-compose ps
 Pause
 
-echo "Initializing and restarting"
-sleep 2
 echo :"Truncate, drop, create table in postgres:"
-
 docker         cp config/countries.sql Postgres:/var/tmp/countries.sql
-docker-compose -f docker-compose.yml exec postgres bash -c "psql -U postgres postgres -f /var/tmp/countries.sql"
-#docker-compose -f docker-compose.yml exec postgres bash -c "psql -U postgres postgres -c \" SELECT * FROM Countries;\" "
+docker-compose exec postgres bash -c "psql -U postgres postgres -f /var/tmp/countries.sql"
+#docker-compose exec postgres bash -c "psql -U postgres postgres -c \" SELECT * FROM Countries;\" "
 
-docker-compose -f docker-compose.yml exec postgres bash -c "psql -U postgres postgres -c \" CREATE TABLE IF NOT EXISTS GDELT_EVENT ( EVENTID BIGINT NOT NULL, EVENT_DATE VARCHAR(500) , MONTHYEAR VARCHAR(500) , YEAR VARCHAR(500) , FRACTIONDATE VARCHAR(500) , ACTOR1CODE VARCHAR(500), ACTOR1NAME VARCHAR(500), ACTOR1COUNTRYCODE VARCHAR(500), ACTOR1KNOWNGROUPCODE VARCHAR(500), ACTOR1ETHNICCODE VARCHAR(500), ACTOR1RELIGION1CODE VARCHAR(500), ACTOR1RELIGION2CODE VARCHAR(500), ACTOR1TYPE1CODE VARCHAR(500), ACTOR1TYPE2CODE VARCHAR(500), ACTOR1TYPE3CODE VARCHAR(500), ACTOR2CODE VARCHAR(500), ACTOR2NAME VARCHAR(500), ACTOR2COUNTRYCODE VARCHAR(500), ACTOR2KNOWNGROUPCODE VARCHAR(500), ACTOR2ETHNICCODE VARCHAR(500), ACTOR2RELIGION1CODE VARCHAR(500), ACTOR2RELIGION2CODE VARCHAR(500), ACTOR2TYPE1CODE VARCHAR(500), ACTOR2TYPE2CODE VARCHAR(500), ACTOR2TYPE3CODE VARCHAR(500), ISROOTEVENT VARCHAR(500) , EVENTCODE VARCHAR(500), EVENTBASECODE VARCHAR(500), EVENTROOTCODE VARCHAR(500), QUADCLASS VARCHAR(500) , GOLDSTEINSCALE VARCHAR(500) , NUMMENTIONS VARCHAR(500) , NUMSOURCES VARCHAR(500) , NUMARTICLES INTEGER , AVGTONE FLOAT, ACTOR1GEO_TYPE VARCHAR(500) , ACTOR1GEO_FULLNAME VARCHAR(500), ACTOR1GEO_COUNTRYCODE VARCHAR(500), ACTOR1GEO_ADM1CODE VARCHAR(500),ACTOR1GEO_ADM2CODE VARCHAR(500), ACTOR1GEO_LAT VARCHAR(500) , ACTOR1GEO_LONG VARCHAR(500) , ACTOR1GEO_FEATUREID VARCHAR(500), ACTOR2GEO_TYPE VARCHAR(10), ACTOR2GEO_FULLNAME VARCHAR(500), ACTOR2GEO_COUNTRYCODE VARCHAR(500), ACTOR2GEO_ADM1CODE VARCHAR(500),ACTOR2GEO_ADM2CODE VARCHAR(500), ACTOR2GEO_LAT VARCHAR(500) , ACTOR2GEO_LONG VARCHAR(500) , ACTOR2GEO_FEATUREID VARCHAR(500), ACTIONGEO_TYPE VARCHAR(500), ACTIONGEO_FULLNAME VARCHAR(500), ACTIONGEO_COUNTRYCODE VARCHAR(500), ACTIONGEO_ADM1CODE VARCHAR(500),ACTIONGEO_ADM2CODE VARCHAR(500), ACTIONGEO_LAT VARCHAR(500), ACTIONGEO_LONG VARCHAR(500), ACTIONGEO_FEATUREID VARCHAR(500), DATEADDED VARCHAR(200), SOURCEURL VARCHAR(5000));\" "
+docker-compose -f docker-compose.yml exec postgres bash -c "psql -U postgres postgres -c \"DROP TABLE GDELT_EVENT; \" "
+docker-compose -f docker-compose.yml exec postgres bash -c "psql -U postgres postgres -c \" CREATE TABLE IF NOT EXISTS GDELT_EVENT (TS VARCHAR, EVENTID BIGINT NOT NULL, EVENT_DATE VARCHAR(500) , MONTHYEAR VARCHAR(500) , YEAR VARCHAR(500) , FRACTIONDATE VARCHAR(500) , ACTOR1CODE VARCHAR(500), ACTOR1NAME VARCHAR(500), ACTOR1COUNTRYCODE VARCHAR(500), ACTOR1KNOWNGROUPCODE VARCHAR(500), ACTOR1ETHNICCODE VARCHAR(500), ACTOR1RELIGION1CODE VARCHAR(500), ACTOR1RELIGION2CODE VARCHAR(500), ACTOR1TYPE1CODE VARCHAR(500), ACTOR1TYPE2CODE VARCHAR(500), ACTOR1TYPE3CODE VARCHAR(500), ACTOR2CODE VARCHAR(500), ACTOR2NAME VARCHAR(500), ACTOR2COUNTRYCODE VARCHAR(500), ACTOR2KNOWNGROUPCODE VARCHAR(500), ACTOR2ETHNICCODE VARCHAR(500), ACTOR2RELIGION1CODE VARCHAR(500), ACTOR2RELIGION2CODE VARCHAR(500), ACTOR2TYPE1CODE VARCHAR(500), ACTOR2TYPE2CODE VARCHAR(500), ACTOR2TYPE3CODE VARCHAR(500), ISROOTEVENT VARCHAR(500) , EVENTCODE VARCHAR(500), EVENTBASECODE VARCHAR(500), EVENTROOTCODE VARCHAR(500), QUADCLASS VARCHAR(500) , GOLDSTEINSCALE VARCHAR(500) , NUMMENTIONS VARCHAR(500) , NUMSOURCES VARCHAR(500) , NUMARTICLES INTEGER , AVGTONE FLOAT, ACTOR1GEO_TYPE VARCHAR(500) , ACTOR1GEO_FULLNAME VARCHAR(500), ACTOR1GEO_COUNTRYCODE VARCHAR(500), ACTOR1GEO_ADM1CODE VARCHAR(500),ACTOR1GEO_ADM2CODE VARCHAR(500), ACTOR1GEO_LAT VARCHAR(500) , ACTOR1GEO_LONG VARCHAR(500) , ACTOR1GEO_FEATUREID VARCHAR(500), ACTOR2GEO_TYPE VARCHAR(10), ACTOR2GEO_FULLNAME VARCHAR(500), ACTOR2GEO_COUNTRYCODE VARCHAR(500), ACTOR2GEO_ADM1CODE VARCHAR(500),ACTOR2GEO_ADM2CODE VARCHAR(500), ACTOR2GEO_LAT VARCHAR(500) , ACTOR2GEO_LONG VARCHAR(500) , ACTOR2GEO_FEATUREID VARCHAR(500), ACTIONGEO_TYPE VARCHAR(500), ACTIONGEO_FULLNAME VARCHAR(500), ACTIONGEO_COUNTRYCODE VARCHAR(500), ACTIONGEO_ADM1CODE VARCHAR(500),ACTIONGEO_ADM2CODE VARCHAR(500), ACTIONGEO_LAT VARCHAR(500), ACTIONGEO_LONG VARCHAR(500), ACTIONGEO_FEATUREID VARCHAR(500), DATEADDED VARCHAR(200), SOURCEURL VARCHAR(5000));\" "
 Pause
 
 FILE=20190712181500.export.csv
 echo "Loading  data/gdelt/${FILE} into Postgres ..."
-docker cp data/gdelt/${FILE} Postgres:/var/tmp
+TS=`echo $FILE|awk -F\. '{print $1}'`
+cp data/gdelt/${FILE} /tmp/${FILE}
+cat /tmp/${FILE} | sed "s/^/${TS}	/" > /tmp/${FILE}.1
+
+docker cp /tmp/${FILE}.1 Postgres:/var/tmp/${FILE}
 docker-compose -f docker-compose.yml exec postgres bash -c "psql -U postgres postgres -c \"delete from GDELT_EVENT; \" "
 docker-compose -f docker-compose.yml exec postgres bash -c "psql -U postgres postgres -c \"\\copy GDELT_EVENT FROM '/var/tmp/${FILE}' WITH delimiter E'\t' null as ';' \" "
 docker-compose -f docker-compose.yml exec postgres bash -c "psql -U postgres postgres -c \"SELECT count(*) from GDELT_EVENT;\" "
 Pause
 
-kafka-topics --bootstrap-server kafka1:9092 --topic GDE_000_gdelt_event --create --replication-factor 1
-kafka-topics --bootstrap-server kafka1:9092 --topic GDE_000_countries   --create --replication-factor 1
+#create topics with infinite retention
+kafka-topics --bootstrap-server kafka1:9092 --topic GDE_000_gdelt_event --create --replication-factor 1 --config retention.ms=-1
+kafka-topics --bootstrap-server kafka1:9092 --topic GDE_000_countries   --create --replication-factor 1 --config retention.ms=-1
+
+
 cat <<EOF >/tmp/cmd.sql
-CREATE SOURCE CONNECTOR source_jdbc_gdelt_event WITH ( 'connector.class'='io.confluent.connect.jdbc.JdbcSourceConnector', 'connection.url'='jdbc:postgresql://postgres:5432/postgres?user=postgres&password=postgres', 'mode'='incrementing','incrementing.column.name'='eventid', 'topic.prefix'='GDE_000_','table.whitelist'='gdelt_event','numeric.mapping'='best_fit','schema.pattern'='public');
+CREATE SOURCE CONNECTOR source_jdbc_gdelt_event WITH ('connector.class'='io.confluent.connect.jdbc.JdbcSourceConnector', 'connection.url'='jdbc:postgresql://postgres:5432/postgres?user=postgres&password=postgres', 'mode'='incrementing','incrementing.column.name'='eventid', 'topic.prefix'='GDE_000_','table.whitelist'='gdelt_event','numeric.mapping'='best_fit','schema.pattern'='public');
 CREATE SOURCE CONNECTOR source_jdbc_countries WITH ( 'connector.class'='io.confluent.connect.jdbc.JdbcSourceConnector', 'connection.url'='jdbc:postgresql://postgres:5432/postgres?user=postgres&password=postgres', 'mode'='incrementing','incrementing.column.name'='id', 'topic.prefix'='GDE_000_','table.whitelist'='countries','numeric.mapping'='best_fit','schema.pattern'='public','topic.creation.default.replication.factor'='1');
 EOF
 runSQL
@@ -97,7 +101,7 @@ EOF
 runSQL
 
 cat <<EOF >/tmp/cmd.sql
-CREATE STREAM GDE_A010_STR WITH (kafka_topic='GDE_000_gdelt_event', value_format='avro',partitions=1,replicas=1);
+CREATE STREAM GDE_A010_STR WITH (kafka_topic='GDE_000_gdelt_event',value_format='avro',partitions=1,replicas=1,timestamp='TS',timestamp_format='yyyyMMddHHmmss');
 CREATE STREAM GDE_C010_STR WITH (kafka_topic='GDE_000_countries', value_format='avro',partitions=1,replicas=1);
 EOF
 runSQL
@@ -112,6 +116,8 @@ runSQL
 #group by 0 is a sneaky little hack
 cat <<EOF >/tmp/cmd.sql
 CREATE TABLE GDE_B010_TAB WITH (kafka_topic='GDE_B010_TAB',value_format='KAFKA',partitions=1,replicas=1) AS SELECT replace(replace(replace(' {"schema":{"type":"struct","fields":[{"type":"map","keys":{"type":"string","optional":false},"values":{"type":"string","optional":false},"optional":false,"field":"tags"},{"type":"string","optional":false,"field":"time"},{"type":"double","optional":true,"field":"value"}],"optional":false,"version":1},"payload":{"tags":{"id":"REPLACEME_ID"},"time":"REPLACEME_TS","value":REPLACEME_VALUE}}' ,'REPLACEME_ID'   ,'GDE_B010_ROWCOUNT'     ) ,'REPLACEME_TS'   ,cast(max(rowtime) as STRING) ) ,'REPLACEME_VALUE',cast(count(*) as STRING)) as influx_json_row FROM GDE_A020_STR GROUP BY 0;
+
+CREATE TABLE GDE_B011_TAB WITH (kafka_topic='GDE_B011_TAB',value_format='KAFKA',partitions=1,replicas=1) AS SELECT replace(replace(replace(' {"schema":{"type":"struct","fields":[{"type":"map","keys":{"type":"string","optional":false},"values":{"type":"string","optional":false},"optional":false,"field":"tags"},{"type":"string","optional":false,"field":"time"},{"type":"double","optional":true,"field":"value"}],"optional":false,"version":1},"payload":{"tags":{"id":"REPLACEME_ID"},"time":"REPLACEME_TS","value":REPLACEME_VALUE}}' ,'REPLACEME_ID'   ,'GDE_B010_ROWCOUNT'     ) ,'REPLACEME_TS'   ,cast(    max(STRINGTOTIMESTAMP(TS, 'yyyyMMddHHmmss', 'UTC')     ) as STRING) ) ,'REPLACEME_VALUE',cast(count(*) as STRING)) as influx_json_row FROM GDE_A020_STR GROUP BY 0;
 EOF
 runSQL
 
@@ -146,13 +152,19 @@ cat <<EOF >/tmp/cmd.sql
 CREATE SINK CONNECTOR sink_inf_D040 WITH ( 'connector.class'='io.confluent.influxdb.InfluxDBSinkConnector','tasks.max'='1','topics'='GDE_D040_STR','influxdb.url'='http://influxdb:8086', 'influxdb.db'='gdelt','influx.db.username'='root','influxdb.password'='root','measurement.name.format'='GDE_D040_STR','value.converter'='org.apache.kafka.connect.json.JsonConverter');
 
 CREATE SINK CONNECTOR sink_inf_B010 WITH ( 'connector.class'='io.confluent.influxdb.InfluxDBSinkConnector','tasks.max'='1','topics'='GDE_B010_TAB','influxdb.url'='http://influxdb:8086', 'influxdb.db'='gdelt','influx.db.username'='root','influxdb.password'='root','measurement.name.format'='GDE_B010_TAB','value.converter'='org.apache.kafka.connect.json.JsonConverter');
+
+CREATE SINK CONNECTOR sink_inf_B011 WITH ( 'connector.class'='io.confluent.influxdb.InfluxDBSinkConnector','tasks.max'='1','topics'='GDE_B011_TAB','influxdb.url'='http://influxdb:8086', 'influxdb.db'='gdelt','influx.db.username'='root','influxdb.password'='root','measurement.name.format'='GDE_B011_TAB','value.converter'='org.apache.kafka.connect.json.JsonConverter');
 EOF
 runSQL
 
 clear
 FILE=20191205000000.export.csv
 echo "Loading  data/gdelt/${FILE} into Postgres ..."
-docker cp data/gdelt/${FILE} Postgres:/var/tmp
+TS=`echo $FILE|awk -F\. '{print $1}'`
+cp data/gdelt/${FILE} /tmp/${FILE}
+cat /tmp/${FILE} | sed "s/^/${TS}	/" > /tmp/${FILE}.1
+
+docker cp /tmp/${FILE}.1 Postgres:/var/tmp/${FILE}
 docker-compose -f docker-compose.yml exec postgres bash -c "psql -U postgres postgres -c \"\\copy GDELT_EVENT FROM '/var/tmp/${FILE}' WITH delimiter E'\t' null as ';' \" "
 docker-compose -f docker-compose.yml exec postgres bash -c "psql -U postgres postgres -c \"SELECT count(*) from GDELT_EVENT;\" "
 

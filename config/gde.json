@@ -2,11 +2,19 @@
     "servers": [{
         "host": "kafka1",
         "port": 3001,
-        "queries": [{
+        "queries": [
+                   {
             "obj": "kafka.server:type=BrokerTopicMetrics,name=*,topic=GDE*",
             "attr": [ "OneMinuteRate" ],
             "resultAlias":"GDE_Metrics",
             "outputWriters": [{ "@class": "com.googlecode.jmxtrans.model.output.InfluxDbWriterFactory", "url": "http://influxdb:8086/", "username": "root", "password": "root", "database": "gde-db", "tags": { "application": "GDE_Metrics" } }]
-        }]
+        }
+                 , {
+            "obj": "kafka.consumer:type=consumer-fetch-manager-metrics,client-id=([-.w]+)",
+            "attr": [ "OneMinuteRate" ],
+            "resultAlias":"GDE_Metrics",
+            "outputWriters": [{ "@class": "com.googlecode.jmxtrans.model.output.InfluxDbWriterFactory", "url": "http://influxdb:8086/", "username": "root", "password": "root", "database": "gde-db", "tags": { "application": "GDE_Metrics" } }]
+        }
+        ]
     }]
 }
