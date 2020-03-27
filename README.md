@@ -139,7 +139,7 @@ Click on dashboard "GDE2".
 Press the upper-right Dashboard icon to view the dashboard in presentation mode.
 You should see this:
 ```
-![Chronograf Dashboard Initial State](images/chronograf-init.png)
+![Chronograf Dashboard Initial State](images/screenshot.png)
 
 9. run "getNews" to load Yesterdays News - this will download, unpack and load new stories for YYYYMMDD-1 of your current date. You can control-C at any time to halt loading. It requires an internet connection, and it will consume tens/hundreds of MB over several minutes.
 
