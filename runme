@@ -101,7 +101,7 @@ EOF
 runSQL
 
 cat <<EOF >/tmp/cmd.sql
-CREATE STREAM GDE_A010_STR WITH (kafka_topic='GDE_000_gdelt_event',value_format='avro',partitions=1,replicas=1,timestamp='TS',timestamp_format='yyyyMMddHHmmss');
+CREATE STREAM GDE_A010_STR WITH (kafka_topic='GDE_000_gdelt_event',value_format='avro',partitions=1,replicas=1);
 CREATE STREAM GDE_C010_STR WITH (kafka_topic='GDE_000_countries', value_format='avro',partitions=1,replicas=1);
 EOF
 runSQL
@@ -114,10 +114,9 @@ EOF
 runSQL
 
 #group by 0 is a sneaky little hack
+#CREATE TABLE GDE_B010_TAB WITH (kafka_topic='GDE_B010_TAB',value_format='KAFKA',partitions=1,replicas=1) AS SELECT replace(replace(replace(' {"schema":{"type":"struct","fields":[{"type":"map","keys":{"type":"string","optional":false},"values":{"type":"string","optional":false},"optional":false,"field":"tags"},{"type":"string","optional":false,"field":"time"},{"type":"double","optional":true,"field":"value"}],"optional":false,"version":1},"payload":{"tags":{"id":"REPLACEME_ID"},"time":"REPLACEME_TS","value":REPLACEME_VALUE}}' ,'REPLACEME_ID'   ,'GDE_B010_ROWCOUNT'     ) ,'REPLACEME_TS'   ,cast(max(rowtime) as STRING) ) ,'REPLACEME_VALUE',cast(count(*) as STRING)) as influx_json_row FROM GDE_A020_STR GROUP BY 0;
 cat <<EOF >/tmp/cmd.sql
-CREATE TABLE GDE_B010_TAB WITH (kafka_topic='GDE_B010_TAB',value_format='KAFKA',partitions=1,replicas=1) AS SELECT replace(replace(replace(' {"schema":{"type":"struct","fields":[{"type":"map","keys":{"type":"string","optional":false},"values":{"type":"string","optional":false},"optional":false,"field":"tags"},{"type":"string","optional":false,"field":"time"},{"type":"double","optional":true,"field":"value"}],"optional":false,"version":1},"payload":{"tags":{"id":"REPLACEME_ID"},"time":"REPLACEME_TS","value":REPLACEME_VALUE}}' ,'REPLACEME_ID'   ,'GDE_B010_ROWCOUNT'     ) ,'REPLACEME_TS'   ,cast(max(rowtime) as STRING) ) ,'REPLACEME_VALUE',cast(count(*) as STRING)) as influx_json_row FROM GDE_A020_STR GROUP BY 0;
-
-CREATE TABLE GDE_B011_TAB WITH (kafka_topic='GDE_B011_TAB',value_format='KAFKA',partitions=1,replicas=1) AS SELECT replace(replace(replace(' {"schema":{"type":"struct","fields":[{"type":"map","keys":{"type":"string","optional":false},"values":{"type":"string","optional":false},"optional":false,"field":"tags"},{"type":"string","optional":false,"field":"time"},{"type":"double","optional":true,"field":"value"}],"optional":false,"version":1},"payload":{"tags":{"id":"REPLACEME_ID"},"time":"REPLACEME_TS","value":REPLACEME_VALUE}}' ,'REPLACEME_ID'   ,'GDE_B010_ROWCOUNT'     ) ,'REPLACEME_TS'   ,cast(    max(STRINGTOTIMESTAMP(TS, 'yyyyMMddHHmmss', 'UTC')     ) as STRING) ) ,'REPLACEME_VALUE',cast(count(*) as STRING)) as influx_json_row FROM GDE_A020_STR GROUP BY 0;
+CREATE TABLE GDE_B010_TAB WITH (kafka_topic='GDE_B010_TAB',value_format='KAFKA',partitions=1,replicas=1) AS SELECT replace(replace(replace(' {"schema":{"type":"struct","fields":[{"type":"map","keys":{"type":"string","optional":false},"values":{"type":"string","optional":false},"optional":false,"field":"tags"},{"type":"string","optional":false,"field":"time"},{"type":"double","optional":true,"field":"value"}],"optional":false,"version":1},"payload":{"tags":{"id":"REPLACEME_ID"},"time":"REPLACEME_TS","value":REPLACEME_VALUE}}' ,'REPLACEME_ID'   ,'GDE_B010_ROWCOUNT'     ) ,'REPLACEME_TS'   ,cast(    max(STRINGTOTIMESTAMP(TS, 'yyyyMMddHHmmss', 'UTC')     ) as STRING) ) ,'REPLACEME_VALUE',cast(count(*) as STRING)) as influx_json_row FROM GDE_A020_STR GROUP BY 0;
 EOF
 runSQL
 
@@ -153,7 +152,6 @@ CREATE SINK CONNECTOR sink_inf_D040 WITH ( 'connector.class'='io.confluent.influ
 
 CREATE SINK CONNECTOR sink_inf_B010 WITH ( 'connector.class'='io.confluent.influxdb.InfluxDBSinkConnector','tasks.max'='1','topics'='GDE_B010_TAB','influxdb.url'='http://influxdb:8086', 'influxdb.db'='gdelt','influx.db.username'='root','influxdb.password'='root','measurement.name.format'='GDE_B010_TAB','value.converter'='org.apache.kafka.connect.json.JsonConverter');
 
-CREATE SINK CONNECTOR sink_inf_B011 WITH ( 'connector.class'='io.confluent.influxdb.InfluxDBSinkConnector','tasks.max'='1','topics'='GDE_B011_TAB','influxdb.url'='http://influxdb:8086', 'influxdb.db'='gdelt','influx.db.username'='root','influxdb.password'='root','measurement.name.format'='GDE_B011_TAB','value.converter'='org.apache.kafka.connect.json.JsonConverter');
 EOF
 runSQL
 
